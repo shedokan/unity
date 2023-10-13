@@ -76,6 +76,9 @@ public class BallGrid : MonoBehaviour {
 #if UNITY_EDITOR
     void OnRectTransformDimensionsChange() {
         print("OnRectTransformDimensionsChange");
+        if(_rectTransform) { // TODO: Replace with didStart in unity 2023
+            CalculateScreen();
+        }
     }
 #endif
 
