@@ -426,6 +426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d17961477eca741a1be322e389ae885d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hexagonalPacking: 1
   zIndex: 100
   ball: {fileID: 3090069234960831311, guid: 347faa6f3a1954a10b8ed235ec2ac9e9, type: 3}
   ballsPerRow: 10
