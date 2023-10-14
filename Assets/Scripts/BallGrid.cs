@@ -135,6 +135,5 @@ public class BallGrid : MonoBehaviour {
         row.Add(newObject);
 
         newObject.transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
-        newObject.transform.localScale = new Vector2(_ballDiameter, _ballDiameter);
     }
 }

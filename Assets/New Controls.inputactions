@@ -1,0 +1,34 @@
+{
+    "name": "New Controls",
+    "maps": [
+        {
+            "name": "Aimer",
+            "id": "683aec1c-0b46-4f0d-adae-e5c766bddc71",
+            "actions": [
+                {
+                    "name": "Fire",
+                    "type": "Button",
+                    "id": "06ac9820-b023-483c-a1a4-93b9f8d261f3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "25e85bd9-1e9f-43ef-b977-eb13057d1e77",
+                    "path": "<Pointer>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
