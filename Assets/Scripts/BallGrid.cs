@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Mathf = UnityEngine.Mathf;
 
 /*
  * Holds the ball grid, and places balls in those positions.
@@ -53,8 +54,6 @@ public class BallGrid : MonoBehaviour {
         }
 
         _lastUpdate = DateTime.Now;
-
-        CreateBallGrid();
     }
 
     void CalculateScreen() {
@@ -63,14 +62,20 @@ public class BallGrid : MonoBehaviour {
 
         // Debug.LogFormat("CalculateScreen() - rect: {0}, pivot: {1}", _rect, rectTransform.pivot);
 
-        CalculateBallDiameter();
+        if(CalculateBallDiameter()) {
+            CreateBallGrid();
+        }
     }
 
-    void CalculateBallDiameter() {
-        // Resize balls
+    bool CalculateBallDiameter() {
+        var prevBallDiameter = _ballDiameter;
+        
+        // Recalculate
         _ballDiameter = _rect.width / ballsPerRow;
         Assert.IsTrue(_ballDiameter > 0);
         // Debug.LogFormat("Ball Diameter: {0}", _ballDiameter);
+
+        return !Mathf.Approximately(_ballDiameter, prevBallDiameter);
     }
 
 #if UNITY_EDITOR
@@ -115,13 +120,13 @@ public class BallGrid : MonoBehaviour {
     }
 
     private void ClearGrid() {
-        if(_grid.Count != 0) {
-            foreach(var cell in _grid.SelectMany(row => row)) {
-                Destroy(cell);
-            }
-
-            _grid.Clear();
+        if(_grid.Count == 0) return;
+        
+        foreach(var cell in _grid.SelectMany(row => row)) {
+            Destroy(cell);
         }
+
+        _grid.Clear();
     }
 
     void PutBall(ref Vector2 pos, ref List<GameObject> row) {
