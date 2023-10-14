@@ -48,10 +48,13 @@ Distance: {Vector2.Distance(position, mouseWorld)}
 
     // Update is called once per frame
     private void FixedUpdate() {
-        var pivotAroundPos = _pivotRectTransform.position;
-        Vector3 mouse3d = Pointer.current.position.value;
-        mouse3d.z = pivotAroundPos.z;
-        var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
+        // TODO: Support touch
+        var pointer = Pointer.current;
+        if(pointer is not null) {
+            var pivotAroundPos = _pivotRectTransform.position;
+            Vector3 mouse3d = pointer.position.value;
+            mouse3d.z = pivotAroundPos.z;
+            var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
 
         LookAt(mouseWorld, pivotAroundPos);
     }
