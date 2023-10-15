@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 7701868509196199396}
   - component: {fileID: 7531966140304910558}
   - component: {fileID: 3886397128653368198}
+  - component: {fileID: 1953080086763347308}
   m_Layer: 6
   m_Name: Ball
-  m_TagString: Hitable
+  m_TagString: Ball
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -102,7 +103,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: fc16708652e1e4e1799f40ce046b2ede, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -166,6 +167,18 @@ TargetJoint2D:
   m_Anchor: {x: 0, y: 0}
   m_Target: {x: 0, y: 0}
   m_AutoConfigureTarget: 1
-  m_MaxForce: 200
+  m_MaxForce: 5000
   m_DampingRatio: 1
-  m_Frequency: 5
+  m_Frequency: 1000
+--- !u!114 &1953080086763347308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3090069234960831311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64ce67e25159744c3aabb4f26c086896, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

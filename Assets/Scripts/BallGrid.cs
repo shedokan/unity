@@ -11,12 +11,15 @@ using Mathf = UnityEngine.Mathf;
  * Expect to be a component
  */
 public class BallGrid : MonoBehaviour {
+    public static BallGrid Current { get; private set; }
+
     private const float Ang60 = 60 * (MathF.PI / 180);
     private static readonly float Sin60 = MathF.Sin(Ang60);
 
     /*
      * Config
      */
+    public RectTransform gridOrigin;
     public GameObject ball;
     public byte ballsPerRow = 10;
     public byte rowCount = 5;
@@ -35,6 +38,9 @@ public class BallGrid : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
+        Assert.IsNull(Current);
+        Current = this;
+
         // Validate parameters
         Assert.IsNotNull(ball);
         _rectTransform = GetComponent<RectTransform>();
@@ -59,8 +65,6 @@ public class BallGrid : MonoBehaviour {
     void CalculateScreen() {
         // Fetch the RectTransform from the GameObject
         _rect = _rectTransform.rect;
-
-        // Debug.LogFormat("CalculateScreen() - rect: {0}, pivot: {1}", _rect, rectTransform.pivot);
 
         if(CalculateBallDiameter()) {
             CreateBallGrid();
@@ -135,5 +139,41 @@ public class BallGrid : MonoBehaviour {
         row.Add(newObject);
 
         newObject.transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
+    }
+
+    public Vector2 RoundToNearestGrid(Vector2 point) {
+        var (col, row) = PixelToHex(point);
+        var originPos = transform.InverseTransformPoint(gridOrigin.position);
+        var y = originPos.y - row * (Sin60 * _ballDiameter) - _ballDiameter / 2;
+
+        var oddRow = hexagonalPacking && row % 2 != 0;
+
+        var x = originPos.x + (col + 0.5f) * _ballDiameter;
+        if(hexagonalPacking && oddRow) {
+            x += _ballDiameter / 2;
+        }
+
+        return transform.TransformPoint(new Vector2(x, y));
+    }
+
+    public (int, int) PixelToHex(Vector2 point) {
+        var point3d = transform.InverseTransformPoint(point);
+        var originPos = transform.InverseTransformPoint(gridOrigin.position);
+        // print($"{rect.xMax}: {(point.x - localPos.x)}; {rect.yMin}: {(localPos.y - point.y)}");
+        // print($"{rect.xMax}: {(point.x - localPos.x)}; {rect.yMin}: {(localPos.y - point.y)}");
+        var yOff = hexagonalPacking ? (Sin60 * _ballDiameter) : _ballDiameter;
+        var row = (int)Math.Floor((originPos.y - point3d.y) / yOff); // Row
+        if(row < 0) row = 0;
+        ;
+
+        var oddRow = hexagonalPacking && row % 2 != 0;
+        var xInGrid = point3d.x - originPos.x;
+        if(hexagonalPacking && oddRow) {
+            xInGrid -= _ballDiameter / 2;
+        }
+
+        var col = (int)Math.Floor(xInGrid / _ballDiameter);
+        col = Math.Clamp(col, 0, hexagonalPacking && oddRow ? ballsPerRow - 2 : ballsPerRow);
+        return (col, row);
     }
 }

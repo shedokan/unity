@@ -42,14 +42,18 @@ public class PlayerController : MonoBehaviour {
         var position = _rectTransform.position;
         var pivotPosition = _pivotRectTransform.position;
 
+        if(!BallGrid.Current) return;
+        var gridRectTransform = BallGrid.Current.GetComponent<RectTransform>();
+        var (col, row) = BallGrid.Current.PixelToHex(mouseWorld);
+        var roundedGrid = BallGrid.Current.RoundToNearestGrid(mouseWorld);
         GUI.Box(new Rect(5, 25, 400, 100), "");
         //The Labels show what the Sliders represent
-        GUI.Label(new Rect(10, 30, 400, 150), $@"Mouse X: {mouse.x}, Y: {mouse.y}
-This(Screen) X: {_mainCamera.WorldToScreenPoint(position).x}, Y: {_mainCamera.WorldToScreenPoint(position).y}
-Pivot(Screen) X: {_mainCamera.WorldToScreenPoint(pivotPosition).x}, Y: {_mainCamera.WorldToScreenPoint(pivotPosition).y}
-Mouse(World) X: {mouseWorld.x}, Y: {mouseWorld.y}, Z: {mouseWorld.z}
+        GUI.Label(new Rect(10, 30, 400, 200), $@"Mouse(World) X: {mouseWorld.x}, Y: {mouseWorld.y}, Z: {mouseWorld.z}
 This X: {position.x}, Y : {position.y}, Z: {position.z}
+ballGrid X: {gridRectTransform.worldToLocalMatrix * mouseWorld}
 Pivot X: {pivotPosition.x}, Y : {pivotPosition.y}, Z: {pivotPosition.z}
+Hex Col: {col}, Row: {row}
+Rounded X: {roundedGrid.x}, Col: {roundedGrid.y}
 Distance: {Vector2.Distance(position, mouseWorld)}
 ");
     }
@@ -81,8 +85,7 @@ Distance: {Vector2.Distance(position, mouseWorld)}
 
         var ball = Instantiate(projectile, _rectTransform.position, _rectTransform.rotation,
             projectileParent.transform);
-        var targetJoint2D = ball.GetComponent<TargetJoint2D>();
-        if(targetJoint2D) targetJoint2D.enabled = false;
+        ball.SendMessage("AfterShot");
 
         var rb2D = ball.GetComponent<Rigidbody2D>();
         rb2D.AddForce(ray.direction * shootThrust);
