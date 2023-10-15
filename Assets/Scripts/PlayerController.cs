@@ -85,7 +85,7 @@ Distance: {Vector2.Distance(position, mouseWorld)}
 
         var ball = Instantiate(projectile, _rectTransform.position, _rectTransform.rotation,
             projectileParent.transform);
-        ball.SendMessage("AfterShot");
+        ball.SendMessage("StartMoving", BallController.RandomColor());
 
         var rb2D = ball.GetComponent<Rigidbody2D>();
         rb2D.AddForce(ray.direction * shootThrust);
@@ -95,7 +95,7 @@ Distance: {Vector2.Distance(position, mouseWorld)}
         var moveDirection = target - pivotAroundPos;
         // TODO: Maybe replace with Vector2.Angle()
         var angle = Angle(moveDirection);
-        ;
+
         angle = (angle >= 90.0f) ? angle - 90.0f : 270.0f + angle;
         var angleAxis = Quaternion.AngleAxis(angle, Vector3.forward);
         _rectTransform.rotation = angleAxis;

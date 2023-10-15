@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Mathf = UnityEngine.Mathf;
+using Vector2 = UnityEngine.Vector2;
 
 /*
  * Holds the ball grid, and places balls in those positions.
@@ -20,7 +21,7 @@ public class BallGrid : MonoBehaviour {
      * Config
      */
     public RectTransform gridOrigin;
-    public GameObject ball;
+    public GameObject ballObject;
     public byte ballsPerRow = 10;
     public byte rowCount = 5;
     public bool hexagonalPacking = true;
@@ -34,7 +35,8 @@ public class BallGrid : MonoBehaviour {
     // Calculated using screen size
     private float _ballDiameter;
 
-    private readonly List<List<GameObject>> _grid = new();
+    private readonly List<List<BallController?>> _grid = new();
+    private byte _maxRows;
 
     // Start is called before the first frame update
     void Start() {
@@ -42,7 +44,7 @@ public class BallGrid : MonoBehaviour {
         Current = this;
 
         // Validate parameters
-        Assert.IsNotNull(ball);
+        Assert.IsNotNull(ballObject);
         _rectTransform = GetComponent<RectTransform>();
         Assert.IsNotNull(_rectTransform);
 
@@ -51,6 +53,7 @@ public class BallGrid : MonoBehaviour {
 
     private static readonly TimeSpan UpdateEvery = new(0, 0, 1);
     private DateTime _lastUpdate;
+    private float _yOff;
 
     // Update is called once per frame
     void Update() {
@@ -66,14 +69,21 @@ public class BallGrid : MonoBehaviour {
         // Fetch the RectTransform from the GameObject
         _rect = _rectTransform.rect;
 
+
         if(CalculateBallDiameter()) {
+            _yOff = hexagonalPacking ? Sin60 * _ballDiameter : _ballDiameter;
+            _maxRows = (byte)Math.Round(_rect.height / _yOff);
+
             CreateBallGrid();
+            CreateBalls();
         }
+
+        // Debug.LogFormat("CalculateScreen() - rect: {0}, pivot: {1}", gridOrigin.rect, gridOrigin.position);
     }
 
     bool CalculateBallDiameter() {
         var prevBallDiameter = _ballDiameter;
-        
+
         // Recalculate
         _ballDiameter = _rect.width / ballsPerRow;
         Assert.IsTrue(_ballDiameter > 0);
@@ -90,59 +100,108 @@ public class BallGrid : MonoBehaviour {
         }
     }
 #endif
-
-    // TODO: Reuse pool, instead of instantiate
     private void CreateBallGrid() {
         // Clear all existing
+        // TODO: Stop clearing grid
         ClearGrid();
 
-        var ballRadius = _ballDiameter / 2;
-        var yOff = hexagonalPacking ? Sin60 * _ballDiameter : _ballDiameter;
+        // TODO: Remove excess
+        // if (_grid.Count > _maxRows) _grid.RemoveRange(_maxRows, _grid.Count - _maxRows);
+        _grid.Capacity = _maxRows;
 
-        Vector2 pos = new();
-        for(var yPos = 0; yPos < rowCount; yPos++) {
-            pos.y = -ballRadius - yOff * yPos;
-
-            var oddRow = hexagonalPacking && yPos % 2 != 0;
+        for(var yIndex = _grid.Count; yIndex < _maxRows; yIndex++) {
+            var oddRow = hexagonalPacking && yIndex % 2 != 0;
             var countForRow = ballsPerRow + 1;
             if(hexagonalPacking && oddRow) {
                 countForRow -= 1;
             }
 
-            // TODO: Don't recreate rows
-            var row = new List<GameObject>(countForRow);
+            var row = new List<BallController?>(countForRow);
             _grid.Add(row);
-            for(byte xPos = 0; xPos < countForRow - 1; xPos++) {
-                pos.x = ballRadius + _ballDiameter * xPos;
+        }
+    }
+
+    private void CreateBalls() {
+        var ballRadius = _ballDiameter / 2;
+
+        Vector2 pos = new();
+        for(byte yIndex = 0; yIndex < rowCount; yIndex++) {
+            var row = _grid[yIndex];
+            pos.y = -ballRadius - _yOff * yIndex;
+
+            var oddRow = hexagonalPacking && yIndex % 2 != 0;
+            var countForRow = row.Capacity;
+
+            for(byte xIndex = 0; xIndex < countForRow - 1; xIndex++) {
+                var ball = row.ElementAtOrDefault(xIndex);
+                if(ball is null) {
+                    ball = CreateBall();
+                    row.Insert(xIndex, ball);
+                }
+                
+                pos.x = ballRadius + _ballDiameter * xIndex;
                 if(hexagonalPacking && oddRow) {
                     pos.x += ballRadius;
                 }
 
-                PutBall(ref pos, ref row);
+                ball.SendMessage("ResetBall", ball.Color);
+                ball.Reposition(pos);
             }
         }
     }
 
+
+    private BallController CreateBall() {
+        // TODO: Use object pooling
+        var newObject = Instantiate(ballObject, transform);
+
+        var ballController = newObject.GetComponent<BallController>();
+        ballController.Color = BallController.RandomColor();
+
+        return ballController;
+    }
+
+
     private void ClearGrid() {
         if(_grid.Count == 0) return;
-        
+
         foreach(var cell in _grid.SelectMany(row => row)) {
-            Destroy(cell);
+            if(cell) Destroy(cell.gameObject);
         }
 
         _grid.Clear();
     }
 
-    void PutBall(ref Vector2 pos, ref List<GameObject> row) {
-        // TODO: Use object pooling
-        var newObject = Instantiate(ball, transform);
-        row.Add(newObject);
-
-        newObject.transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
-    }
-
     public Vector2 RoundToNearestGrid(Vector2 point) {
         var (col, row) = PixelToHex(point);
+        return PosInGrid(col, row);
+    }
+
+    // Point is in world space
+    public (int, int) PixelToHex(Vector2 point) {
+        var point3d = transform.InverseTransformPoint(point);
+        var originPos = transform.InverseTransformPoint(gridOrigin.position);
+        var yOff = hexagonalPacking ? (Sin60 * _ballDiameter) : _ballDiameter;
+        var row = (int)Math.Floor((originPos.y - point3d.y) / yOff); // Row
+        if(row < 0) row = 0;
+
+
+        var oddRow = hexagonalPacking && row % 2 != 0;
+        var xInGrid = point3d.x - originPos.x;
+        if(hexagonalPacking && oddRow) {
+            xInGrid -= _ballDiameter / 2;
+        }
+
+        var col = (int)Math.Floor(xInGrid / _ballDiameter);
+        col = Math.Clamp(col, 0, hexagonalPacking && oddRow ? ballsPerRow - 2 : ballsPerRow);
+        return (col, row);
+    }
+    
+    /**
+     * Returns position in local space
+     */
+    // TODO: Move ball grid to global space, without scaling issues
+    public Vector2 PosInGrid(int col, int row) {
         var originPos = transform.InverseTransformPoint(gridOrigin.position);
         var y = originPos.y - row * (Sin60 * _ballDiameter) - _ballDiameter / 2;
 
@@ -156,24 +215,14 @@ public class BallGrid : MonoBehaviour {
         return transform.TransformPoint(new Vector2(x, y));
     }
 
-    public (int, int) PixelToHex(Vector2 point) {
-        var point3d = transform.InverseTransformPoint(point);
-        var originPos = transform.InverseTransformPoint(gridOrigin.position);
-        // print($"{rect.xMax}: {(point.x - localPos.x)}; {rect.yMin}: {(localPos.y - point.y)}");
-        // print($"{rect.xMax}: {(point.x - localPos.x)}; {rect.yMin}: {(localPos.y - point.y)}");
-        var yOff = hexagonalPacking ? (Sin60 * _ballDiameter) : _ballDiameter;
-        var row = (int)Math.Floor((originPos.y - point3d.y) / yOff); // Row
-        if(row < 0) row = 0;
-        ;
-
-        var oddRow = hexagonalPacking && row % 2 != 0;
-        var xInGrid = point3d.x - originPos.x;
-        if(hexagonalPacking && oddRow) {
-            xInGrid -= _ballDiameter / 2;
-        }
-
-        var col = (int)Math.Floor(xInGrid / _ballDiameter);
-        col = Math.Clamp(col, 0, hexagonalPacking && oddRow ? ballsPerRow - 2 : ballsPerRow);
-        return (col, row);
+    public void PlaceGameObject(int colIndex, int rowIndex, BallController ballController) {
+        var row = _grid.ElementAtOrDefault(rowIndex);
+        Assert.IsNotNull(row);
+        var cell = row?.ElementAtOrDefault(colIndex);
+        Assert.IsNull(cell);
+        // TODO: prep this ahead of time
+        while(row.Count < colIndex) row.Add(null);
+        
+        row.Add(ballController);
     }
 }
