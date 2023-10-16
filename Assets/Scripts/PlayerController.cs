@@ -42,10 +42,10 @@ public class PlayerController : MonoBehaviour {
         var position = _rectTransform.position;
         var pivotPosition = _pivotRectTransform.position;
 
-        if(!BallGrid.Current) return;
-        var gridRectTransform = BallGrid.Current.GetComponent<RectTransform>();
-        var coord = BallGrid.Current.PosToOffset(mouseWorld);
-        var roundedGrid = BallGrid.Current.RoundToNearestGrid(mouseWorld);
+        if(!BallGrid.current) return;
+        var gridRectTransform = BallGrid.current.GetComponent<RectTransform>();
+        var coord = BallGrid.current.PosToOffset(mouseWorld);
+        var roundedGrid = BallGrid.current.RoundToNearestGrid(mouseWorld);
         GUI.Box(new Rect(5, 25, 400, 100), "");
         //The Labels show what the Sliders represent
         GUI.Label(new Rect(10, 30, 400, 200), $@"Mouse(World) X: {mouseWorld.x}, Y: {mouseWorld.y}, Z: {mouseWorld.z}

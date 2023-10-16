@@ -25,12 +25,12 @@ public class BallController : MonoBehaviour {
         }
     }
     
-    public OffsetCoord? Coord;
+    public OffsetCoord? coord;
 
-    private bool Moving => Coord is not null;
+    private bool moving => coord is not null;
     private TargetJoint2D _targetJoint2D;
 
-    private TargetJoint2D TargetJoint2D {
+    private TargetJoint2D targetJoint2D {
         get {
             if(!_targetJoint2D) {
                 _targetJoint2D = GetComponent<TargetJoint2D>();
@@ -48,34 +48,34 @@ public class BallController : MonoBehaviour {
     void Update() { }
 
     [UsedImplicitly]
-    void ResetBall(Color color, OffsetCoord coord) {
+    void ResetBall(Color color, OffsetCoord newCoord) {
         Color = color;
-        Coord = coord;
+        coord = newCoord;
         
-        TargetJoint2D.enabled = true;
+        targetJoint2D.enabled = true;
     }
 
     [UsedImplicitly]
     void StartMoving(Color color) {
         Color = color;
-        Coord = null;
+        coord = null;
 
-        TargetJoint2D.enabled = false;
+        targetJoint2D.enabled = false;
     }
 
     void StopMoving() {
-        TargetJoint2D.autoConfigureTarget = false;
-        var coord = BallGrid.Current.PosToOffset(transform.position);
-        BallGrid.Current.PlaceGameObject(coord, this);
-        TargetJoint2D.target = BallGrid.Current.PosInGrid(coord);
+        targetJoint2D.autoConfigureTarget = false;
+        var newCoord = BallGrid.current.PosToOffset(transform.position);
+        BallGrid.current.PlaceGameObject(newCoord, this);
+        targetJoint2D.target = BallGrid.current.PosInGrid(newCoord);
         // TODO: Add to grid
-        TargetJoint2D.enabled = true;
+        targetJoint2D.enabled = true;
 
-        Coord = coord;
+        coord = newCoord;
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
-        if(!Moving || !collision.collider.CompareTag("Ball")) return;
+        if(!moving || !collision.collider.CompareTag("Ball")) return;
 
         // TODO: Check if collided with wall
         // collision.otherCollider.CompareTag("Hitable")

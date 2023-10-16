@@ -21,7 +21,7 @@ public struct OffsetCoord {
  * Expect to be a component
  */
 public class BallGrid : MonoBehaviour {
-    public static BallGrid Current { get; private set; }
+    public static BallGrid current { get; private set; }
 
     private const float Ang60 = 60 * (MathF.PI / 180);
     private static readonly float Sin60 = MathF.Sin(Ang60);
@@ -49,8 +49,8 @@ public class BallGrid : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        Assert.IsNull(Current);
-        Current = this;
+        Assert.IsNull(current);
+        current = this;
 
         // Validate parameters
         Assert.IsNotNull(ballObject);
