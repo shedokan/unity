@@ -6,15 +6,6 @@ using UnityEngine.Assertions;
 using Mathf = UnityEngine.Mathf;
 using Vector2 = UnityEngine.Vector2;
 
-
-public struct OffsetCoord {
-    public readonly int col, row;
-    public OffsetCoord(int col, int row) {
-        this.col = col;
-        this.row = row;
-    }
-}
-
 /*
  * Holds the ball grid, and places balls in those positions.
  *
@@ -186,7 +177,7 @@ public class BallGrid : MonoBehaviour {
     }
 
     // Point is in world space
-    public OffsetCoord PosToOffset(Vector2 point) {
+    public Vector2Int PosToOffset(Vector2 point) {
         var point3d = transform.InverseTransformPoint(point);
         var originPos = transform.InverseTransformPoint(gridOrigin.position);
         var yOff = hexagonalPacking ? (Sin60 * _ballDiameter) : _ballDiameter;
@@ -202,20 +193,20 @@ public class BallGrid : MonoBehaviour {
 
         var col = (int)Math.Floor(xInGrid / _ballDiameter);
         col = Math.Clamp(col, 0, hexagonalPacking && oddRow ? ballsPerRow - 2 : ballsPerRow);
-        return new OffsetCoord(col, row);
+        return new Vector2Int(col, row);
     }
 
     /**
      * Returns position in local space
      */
     // TODO: Move ball grid to global space, without scaling issues
-    public Vector2 PosInGrid(OffsetCoord coord) {
+    public Vector2 PosInGrid(Vector2Int coord) {
         var originPos = transform.InverseTransformPoint(gridOrigin.position);
-        var y = originPos.y - coord.row * (Sin60 * _ballDiameter) - _ballDiameter / 2;
+        var y = originPos.y - coord.y * (Sin60 * _ballDiameter) - _ballDiameter / 2;
 
-        var oddRow = hexagonalPacking && coord.row % 2 != 0;
+        var oddRow = hexagonalPacking && coord.y % 2 != 0;
 
-        var x = originPos.x + (coord.col + 0.5f) * _ballDiameter;
+        var x = originPos.x + (coord.x + 0.5f) * _ballDiameter;
         if(hexagonalPacking && oddRow) {
             x += _ballDiameter / 2;
         }
@@ -223,13 +214,13 @@ public class BallGrid : MonoBehaviour {
         return transform.TransformPoint(new Vector2(x, y));
     }
 
-    public void PlaceGameObject(OffsetCoord coord, BallController ballController) {
-        var row = _grid.ElementAtOrDefault(coord.row);
+    public void PlaceGameObject(Vector2Int coord, BallController ballController) {
+        var row = _grid.ElementAtOrDefault(coord.y);
         Assert.IsNotNull(row);
-        var cell = row?.ElementAtOrDefault(coord.col);
+        var cell = row?.ElementAtOrDefault(coord.x);
         Assert.IsNull(cell);
         // TODO: prep this ahead of time
-        while(row.Count < coord.col) row.Add(null);
+        while(row.Count < coord.x) row.Add(null);
 
         row.Add(ballController);
     }

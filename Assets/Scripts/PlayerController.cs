@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour {
 This X: {position.x}, Y : {position.y}, Z: {position.z}
 ballGrid X: {gridRectTransform.worldToLocalMatrix * mouseWorld}
 Pivot X: {pivotPosition.x}, Y : {pivotPosition.y}, Z: {pivotPosition.z}
-Hex Col: {coord.col}, Row: {coord.row}
+Hex Col: {coord.x}, Row: {coord.y}
 Rounded X: {roundedGrid.x}, Col: {roundedGrid.y}
 Distance: {Vector2.Distance(position, mouseWorld)}
 ");

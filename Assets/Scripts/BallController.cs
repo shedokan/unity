@@ -25,7 +25,7 @@ public class BallController : MonoBehaviour {
         }
     }
     
-    public OffsetCoord? coord;
+    public Vector2Int? coord;
 
     private bool moving => coord is not null;
     private TargetJoint2D _targetJoint2D;
@@ -48,7 +48,7 @@ public class BallController : MonoBehaviour {
     void Update() { }
 
     [UsedImplicitly]
-    void ResetBall(Color color, OffsetCoord newCoord) {
+    void ResetBall(Color color, Vector2Int newCoord) {
         Color = color;
         coord = newCoord;
         
