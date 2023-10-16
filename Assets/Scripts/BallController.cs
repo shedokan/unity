@@ -17,7 +17,6 @@ public class BallController : MonoBehaviour {
     }
 
     private Color _color;
-
     public Color Color {
         get => _color;
         set {
@@ -25,8 +24,10 @@ public class BallController : MonoBehaviour {
             spriteRenderer.color = _color = value;
         }
     }
+    
+    public OffsetCoord? Coord;
 
-    private bool _moving = false;
+    private bool Moving => Coord is not null;
     private TargetJoint2D _targetJoint2D;
 
     private TargetJoint2D TargetJoint2D {
@@ -47,35 +48,34 @@ public class BallController : MonoBehaviour {
     void Update() { }
 
     [UsedImplicitly]
-    void ResetBall(Color color) {
+    void ResetBall(Color color, OffsetCoord coord) {
         Color = color;
+        Coord = coord;
+        
         TargetJoint2D.enabled = true;
-        _moving = false;
     }
 
     [UsedImplicitly]
     void StartMoving(Color color) {
         Color = color;
+        Coord = null;
 
         TargetJoint2D.enabled = false;
-
-        _moving = true;
     }
 
     void StopMoving() {
         TargetJoint2D.autoConfigureTarget = false;
-        var (col, row) = BallGrid.Current.PixelToHex(transform.position);
-        BallGrid.Current.PlaceGameObject(col, row, this);
-        TargetJoint2D.target = BallGrid.Current.PosInGrid(col, row);
+        var coord = BallGrid.Current.PosToOffset(transform.position);
+        BallGrid.Current.PlaceGameObject(coord, this);
+        TargetJoint2D.target = BallGrid.Current.PosInGrid(coord);
         // TODO: Add to grid
         TargetJoint2D.enabled = true;
 
-        // Destroy(gameObject);
-        _moving = false;
+        Coord = coord;
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
-        if(!_moving || !collision.collider.CompareTag("Ball")) return;
+        if(!Moving || !collision.collider.CompareTag("Ball")) return;
 
         // TODO: Check if collided with wall
         // collision.otherCollider.CompareTag("Hitable")

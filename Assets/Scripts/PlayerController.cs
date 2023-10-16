@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour {
 
         if(!BallGrid.Current) return;
         var gridRectTransform = BallGrid.Current.GetComponent<RectTransform>();
-        var (col, row) = BallGrid.Current.PixelToHex(mouseWorld);
+        var coord = BallGrid.Current.PosToOffset(mouseWorld);
         var roundedGrid = BallGrid.Current.RoundToNearestGrid(mouseWorld);
         GUI.Box(new Rect(5, 25, 400, 100), "");
         //The Labels show what the Sliders represent
@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour {
 This X: {position.x}, Y : {position.y}, Z: {position.z}
 ballGrid X: {gridRectTransform.worldToLocalMatrix * mouseWorld}
 Pivot X: {pivotPosition.x}, Y : {pivotPosition.y}, Z: {pivotPosition.z}
-Hex Col: {col}, Row: {row}
+Hex Col: {coord.col}, Row: {coord.row}
 Rounded X: {roundedGrid.x}, Col: {roundedGrid.y}
 Distance: {Vector2.Distance(position, mouseWorld)}
 ");

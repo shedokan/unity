@@ -6,6 +6,15 @@ using UnityEngine.Assertions;
 using Mathf = UnityEngine.Mathf;
 using Vector2 = UnityEngine.Vector2;
 
+
+public struct OffsetCoord {
+    public readonly int col, row;
+    public OffsetCoord(int col, int row) {
+        this.col = col;
+        this.row = row;
+    }
+}
+
 /*
  * Holds the ball grid, and places balls in those positions.
  *
@@ -138,7 +147,7 @@ public class BallGrid : MonoBehaviour {
                     ball = CreateBall();
                     row.Insert(xIndex, ball);
                 }
-                
+
                 pos.x = ballRadius + _ballDiameter * xIndex;
                 if(hexagonalPacking && oddRow) {
                     pos.x += ballRadius;
@@ -173,12 +182,11 @@ public class BallGrid : MonoBehaviour {
     }
 
     public Vector2 RoundToNearestGrid(Vector2 point) {
-        var (col, row) = PixelToHex(point);
-        return PosInGrid(col, row);
+        return PosInGrid(PosToOffset(point));
     }
 
     // Point is in world space
-    public (int, int) PixelToHex(Vector2 point) {
+    public OffsetCoord PosToOffset(Vector2 point) {
         var point3d = transform.InverseTransformPoint(point);
         var originPos = transform.InverseTransformPoint(gridOrigin.position);
         var yOff = hexagonalPacking ? (Sin60 * _ballDiameter) : _ballDiameter;
@@ -194,20 +202,20 @@ public class BallGrid : MonoBehaviour {
 
         var col = (int)Math.Floor(xInGrid / _ballDiameter);
         col = Math.Clamp(col, 0, hexagonalPacking && oddRow ? ballsPerRow - 2 : ballsPerRow);
-        return (col, row);
+        return new OffsetCoord(col, row);
     }
-    
+
     /**
      * Returns position in local space
      */
     // TODO: Move ball grid to global space, without scaling issues
-    public Vector2 PosInGrid(int col, int row) {
+    public Vector2 PosInGrid(OffsetCoord coord) {
         var originPos = transform.InverseTransformPoint(gridOrigin.position);
-        var y = originPos.y - row * (Sin60 * _ballDiameter) - _ballDiameter / 2;
+        var y = originPos.y - coord.row * (Sin60 * _ballDiameter) - _ballDiameter / 2;
 
-        var oddRow = hexagonalPacking && row % 2 != 0;
+        var oddRow = hexagonalPacking && coord.row % 2 != 0;
 
-        var x = originPos.x + (col + 0.5f) * _ballDiameter;
+        var x = originPos.x + (coord.col + 0.5f) * _ballDiameter;
         if(hexagonalPacking && oddRow) {
             x += _ballDiameter / 2;
         }
@@ -215,14 +223,14 @@ public class BallGrid : MonoBehaviour {
         return transform.TransformPoint(new Vector2(x, y));
     }
 
-    public void PlaceGameObject(int colIndex, int rowIndex, BallController ballController) {
-        var row = _grid.ElementAtOrDefault(rowIndex);
+    public void PlaceGameObject(OffsetCoord coord, BallController ballController) {
+        var row = _grid.ElementAtOrDefault(coord.row);
         Assert.IsNotNull(row);
-        var cell = row?.ElementAtOrDefault(colIndex);
+        var cell = row?.ElementAtOrDefault(coord.col);
         Assert.IsNull(cell);
         // TODO: prep this ahead of time
-        while(row.Count < colIndex) row.Add(null);
-        
+        while(row.Count < coord.col) row.Add(null);
+
         row.Add(ballController);
     }
 }
