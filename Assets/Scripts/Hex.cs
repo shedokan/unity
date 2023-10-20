@@ -157,7 +157,7 @@ readonly struct HexOrientation
     public readonly float qToY; // f2, q -> y
     public readonly float rToY; // f3, r -> y
     
-    // Pixel to Hex
+    // Pixel to Hex (inverted matrix of above)
     public readonly float xToQ; // b0
     public readonly float yToQ; // b1
     public readonly float xToR; // b2
@@ -171,8 +171,8 @@ readonly struct HexOrientation
     public static HexOrientation Pointy = new(Mathf.Sqrt(3.0f), Mathf.Sqrt(3.0f) / 2.0f, 0.0f, 3.0f / 2.0f,
         Mathf.Sqrt(3.0f) / 3.0f, -1.0f / 3.0f, 0.0f, 2.0f / 3.0f, 0.5f);
     public static HexOrientation Flat = new(3.0f / 2.0f, 0.0f, Mathf.Sqrt(3.0f) / 2.0f, Mathf.Sqrt(3.0f), 2.0f / 3.0f, 0.0f, -1.0f / 3.0f, Mathf.Sqrt(3.0f) / 3.0f, 0.0f);
-    public static HexOrientation Ball = new(2f, 2 * Cos60, 0.0f, 2 * Sin60,
-        Mathf.Sqrt(3.0f) / 3.0f, -1.0f / 3.0f, 0.0f, 2.0f / 3.0f, 0.5f);
+    public static HexOrientation Circular = new(2f, 1f, 0.0f, Mathf.Sqrt(3.0f),
+        0.5f, -Mathf.Sqrt(3.0f) / 6, 0, 1 / Mathf.Sqrt(3.0f), 0.5f);
 }
 
 readonly struct HexLayout {

@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Mathf = UnityEngine.Mathf;
-using Vector2 = UnityEngine.Vector2;
 
 
 /*
@@ -79,7 +77,7 @@ public class BallGrid : MonoBehaviour
             // TODO: Get this 10px anchor from objects
             var radiusVector2 = new Vector2(_ballDiameter / 2, _ballDiameter / 2);
             // Debug.Log($"this this: {_rectTransform.InverseTransformVector(gridOrigin.position)}");
-            _gridLayout = new HexLayout(HexOrientation.Ball, radiusVector2, radiusVector2);
+            _gridLayout = new HexLayout(HexOrientation.Circular, radiusVector2, radiusVector2);
 
             CreateBallGrid();
             CreateBalls();
@@ -175,13 +173,14 @@ public class BallGrid : MonoBehaviour
 
     public Vector2 RoundToNearestGrid(Vector2 point)
     {
-        return PosInGrid(PosToHex(point).Round());
+        return PosInGrid(WorldPosToHex(point).Round());
     }
 
-    // Point is in world space
-    public FractionalHex PosToHex(Vector3 point)
+    /// <param name="worldPos">A position in world space</param>
+    /// <returns>Hex coordinates of the given position</returns>
+    public FractionalHex WorldPosToHex(Vector3 worldPos)
     {
-        var point3d = transform.InverseTransformPoint(point);
+        var point3d = transform.InverseTransformPoint(worldPos);
         var originPos = transform.InverseTransformPoint(_rectTransform.position);
 
         var gridPos = new Vector2(
@@ -193,7 +192,7 @@ public class BallGrid : MonoBehaviour
 
     public Vector2Int PosToOffset(Vector2 point)
     {
-        return PosToHex(point).Round().ToOffset();
+        return WorldPosToHex(point).Round().ToOffset();
     }
 
     /// <returns>
@@ -204,24 +203,10 @@ public class BallGrid : MonoBehaviour
     {
         var originPos = _rectTransform.InverseTransformPoint(_rectTransform.position);
 
-        // TODO: Use _gridLayout.origin
         var pos = _gridLayout.HexToPixel(hex);
-        // Debug.Log($"r: {hex.r}, q: {hex.q} -> y: {pos.y}, x: {pos.x}");
         pos.x += originPos.x;
         pos.y = originPos.y - pos.y;
 
-        // return new Vector2(x + originPos.x, -(y + originPos.y));
-        //
-        // var y = originPos.y - coord.y * (Sin60 * _ballDiameter) - _ballDiameter / 2;
-        //
-        // var oddRow = hexagonalPacking && coord.y % 2 != 0;
-        //
-        // var x = originPos.x + (coord.x + 0.5f) * _ballDiameter;
-        // if(hexagonalPacking && oddRow) {
-        //     x += _ballDiameter / 2;
-        // }
-
-        // return _rectTransform.TransformPoint(pos);
         return pos;
     }
 
@@ -242,8 +227,9 @@ public class BallGrid : MonoBehaviour
                 }
             }
         }
+
         Assert.IsTrue(canPlace, $"Can't place: {hex}");
-        
+
         _grid.hexes.Add(hex, ballController);
 
         return hex;

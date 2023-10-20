@@ -24,10 +24,12 @@ public class BallController : MonoBehaviour {
             spriteRenderer.color = _color = value;
         }
     }
-    
+
     private Hex? _hexCoords;
 
     private bool moving => _hexCoords is null;
+
+    // Note: Auto reconfigure target is useful fo recalculation
     private TargetJoint2D _targetJoint2D;
 
     private TargetJoint2D targetJoint2D {
@@ -41,26 +43,15 @@ public class BallController : MonoBehaviour {
         }
     }
 
-    // Start is called before the first frame update
-    void Start() { }
-
-    // Update is called once per frame
-    void Update() { }
-
     [UsedImplicitly]
-    public Vector2 LockPosition(Hex newHex) {
+    public Vector2 LockPosition(Hex newHex, bool skipReposition = false) {
         _hexCoords = newHex;
         targetJoint2D.enabled = true;
 
         var pos = BallGrid.current.PosInGrid(newHex);
-        Debug.Log($"LockPosition({newHex}: {pos}");
-        transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
-        // transform.position = pos;
+        if(!skipReposition) transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
+        // Debug.Log($"LockPosition({newHex}: {pos}");
 
-        
-        // targetJoint2D.autoConfigureTarget = false;
-        // targetJoint2D.target =  BallGrid.current.transform.TransformPoint(pos);;
-        
         return pos;
     }
 
@@ -73,40 +64,19 @@ public class BallController : MonoBehaviour {
     }
 
     void StopMoving() {
-        var newHex = BallGrid.current.PosToHex(transform.position).Round();
+        var newHex = BallGrid.current.WorldPosToHex(transform.position).Round();
         newHex = BallGrid.current.PlaceGameObject(newHex, this);
-        // TODO: Add to grid
 
         var pos = LockPosition(newHex);
+        var worldPos = BallGrid.current.transform.TransformPoint(pos);
+        targetJoint2D.target = worldPos;
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
         if(!moving || !collision.collider.CompareTag("Ball")) return;
 
-        // TODO: Check if collided with wall
-        // collision.otherCollider.CompareTag("Hitable")
         Debug.Log($"OnCollisionEnter2D, collider tag: {collision.collider}");
-        // foreach (ContactPoint contact in collision.contacts)
-        // {
-        //     Debug.DrawLine(contact.point, contact.point + contact.normal * 100, Color.white);
-        // }
 
         StopMoving();
-        
-        Debug.Log("sdasd");
-
-
-        // var colliderBallController = collision.collider.gameObject.GetComponent<BallController>();
-        // if(colliderBallController.moving) return;
-        // // Falling
-        // collision.collider.attachedRigidbody.gravityScale = 1;
-        // collision.collider.gameObject.GetComponent<TargetJoint2D>().enabled = false;
-        // collision.collider.gameObject.GetComponent<BallController>().moving = true;
-        //
-        // // Us
-        // collision.otherCollider.attachedRigidbody.gravityScale = 1;
-
-        // if (collision.relativeVelocity.magnitude > 2)
-        //     audioSource.Play();
     }
 }

@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour {
         var pivotPosition = _pivotRectTransform.position;
 
         if(!BallGrid.current) return;
-        var mouseHex = BallGrid.current.PosToHex(mouseWorld);
+        var mouseHex = BallGrid.current.WorldPosToHex(mouseWorld);
         var roundedGrid = BallGrid.current.RoundToNearestGrid(mouseWorld);
         var gridRectTransform = BallGrid.current.GetComponent<RectTransform>();
         GUI.Box(new Rect(5, 25, 400, 100), "");
@@ -78,7 +78,6 @@ Distance: {Vector2.Distance(position, mouseWorld)}
         if(!hit) return;
         Debug.DrawLine(_aimRay.origin, hit.point, Color.red, 2);
 
-        return;
         ShootBall(_aimRay);
     }
 
