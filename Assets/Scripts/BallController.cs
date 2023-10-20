@@ -12,11 +12,12 @@ public class BallController : MonoBehaviour {
     };
 
     private Color _color;
-
-    private Hex? _hexCoords;
+    private bool _dropped;
 
     // Note: Auto reconfigure target is useful fo recalculation
     private TargetJoint2D _targetJoint2D;
+
+    public Hex? hexCoords { get; private set; }
 
     public Color color {
         get => _color;
@@ -26,7 +27,7 @@ public class BallController : MonoBehaviour {
         }
     }
 
-    private bool moving => _hexCoords is null;
+    private bool moving => hexCoords is null;
 
     private TargetJoint2D targetJoint2D {
         get {
@@ -40,7 +41,7 @@ public class BallController : MonoBehaviour {
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
-        if(!moving || !collision.collider.CompareTag("Ball")) return;
+        if(!moving || _dropped || !collision.collider.CompareTag("Ball")) return;
 
         Debug.Log($"OnCollisionEnter2D, collider tag: {collision.collider}");
 
@@ -54,12 +55,13 @@ public class BallController : MonoBehaviour {
 
     [UsedImplicitly]
     public Vector2 LockPosition(Hex newHex, bool skipReposition = false) {
-        _hexCoords = newHex;
+        hexCoords = newHex;
         targetJoint2D.enabled = true;
 
         var pos = BallGrid.current.PosInGrid(newHex);
         if(!skipReposition) transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
         // Debug.Log($"LockPosition({newHex}: {pos}");
+
 
         return pos;
     }
@@ -67,17 +69,38 @@ public class BallController : MonoBehaviour {
     [UsedImplicitly]
     private void StartMoving(Color color_) {
         color = color_;
-        _hexCoords = null;
+        hexCoords = null;
 
         targetJoint2D.enabled = false;
     }
 
     private void StopMoving() {
-        var newHex = BallGrid.current.WorldPosToHex(transform.position).Round();
-        newHex = BallGrid.current.PlaceGameObject(newHex, this);
+        var ballGrid = BallGrid.current;
+        var newHex = ballGrid.WorldPosToHex(transform.position).Round();
+        newHex = ballGrid.PlaceGameObject(newHex, this);
 
         var pos = LockPosition(newHex);
-        var worldPos = BallGrid.current.transform.TransformPoint(pos);
+        var worldPos = ballGrid.transform.TransformPoint(pos);
         targetJoint2D.target = worldPos;
+
+        ballGrid.CheckHit(newHex, color);
+    }
+
+    public void Drop() {
+        _targetJoint2D.enabled = false;
+        var rigidBody = GetComponent<Rigidbody2D>();
+        rigidBody.gravityScale = 1;
+
+
+        // TODO: Collide only with the dead zone
+        // TODO: Don't let other balls collide with this one
+        // GetComponent<Collider2D>().enabled = false;
+
+        if(hexCoords is { } hex) {
+            BallGrid.current.RemoveGameObject(hex);
+            hexCoords = null;
+        }
+
+        _dropped = true;
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -16,6 +18,8 @@ public class BallGrid : MonoBehaviour {
     public byte ballsPerRow = 10;
     public byte rowCount = 5;
     public bool hexagonalPacking = true;
+    public int groupHitThreshold = 3;
+
     private readonly HexMap<BallController> _grid = new();
 
     /// Calculated using screen size
@@ -166,5 +170,48 @@ public class BallGrid : MonoBehaviour {
         _grid.hexes.Add(hex, ballController);
 
         return hex;
+    }
+
+    public void RemoveGameObject(Hex hex) {
+        _grid.hexes.Remove(hex);
+    }
+
+    /// <summary>
+    ///     Checks if there is a group of balls of the same color that is more than the threshold
+    /// </summary>
+    /// <param name="origHex">Starting coordinates</param>
+    /// <param name="color">Color to filter</param>
+    /// <returns>true if there was a hit</returns>
+    public bool CheckHit(Hex origHex, Color color) {
+        HashSet<Hex> visited = new();
+        HashSet<Hex> same = new();
+        Queue<Hex> toVisit = new();
+        toVisit.Enqueue(origHex);
+
+        while(toVisit.Count > 0) {
+            var hex = toVisit.Dequeue();
+            same.Add(hex);
+            visited.Add(hex);
+
+            foreach(var hexInDir in Hex.directions.Select(dir => hex.Add(dir))) {
+                if(visited.Contains(hexInDir)) continue;
+
+                if(_grid.hexes.TryGetValue(hexInDir, out var currBall) && currBall.color == color) {
+                    toVisit.Enqueue(hexInDir);
+                    continue;
+                }
+
+                // Add it to avoid fetching it again from grid
+                visited.Add(hexInDir);
+            }
+        }
+
+        var overThreshold = same.Count >= groupHitThreshold;
+        if(!overThreshold) return false;
+
+        Debug.Log($"countSame: {same.Count}");
+        foreach(var hex in same) _grid.hexes[hex].Drop();
+
+        return true;
     }
 }
