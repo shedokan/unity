@@ -46,6 +46,7 @@ public class BallGrid : MonoBehaviour
         Assert.IsNotNull(_rectTransform);
 
         CalculateScreen();
+        BallsCreate();
     }
 
     private static readonly TimeSpan UpdateEvery = new(0, 0, 1);
@@ -68,22 +69,13 @@ public class BallGrid : MonoBehaviour
         // Fetch the RectTransform from the GameObject
         _rect = _rectTransform.rect;
 
-
         if(CalculateBallDiameter())
         {
-            // Debug.Log($"gridOrigin.position: {gridOrigin.position}");
-            // Debug.Log($"gridOrigin.localPosition: {gridOrigin.localPosition}");
-            // Debug.Log($"_rectTransform.localPosition: {_rectTransform.localPosition}");
-            // TODO: Get this 10px anchor from objects
             var radiusVector2 = new Vector2(_ballDiameter / 2, _ballDiameter / 2);
-            // Debug.Log($"this this: {_rectTransform.InverseTransformVector(gridOrigin.position)}");
             _gridLayout = new HexLayout(HexOrientation.Circular, radiusVector2, radiusVector2);
 
-            CreateBallGrid();
-            CreateBalls();
+            BallReposition();
         }
-
-        // Debug.LogFormat("CalculateScreen() - rect: {0}, pivot: {1}", gridOrigin.rect, gridOrigin.position);
     }
 
     bool CalculateBallDiameter()
@@ -95,7 +87,6 @@ public class BallGrid : MonoBehaviour
         Assert.IsTrue(_ballDiameter > 0);
         // Rescale prefab
         ballObject.transform.localScale = new Vector2(_ballDiameter, _ballDiameter);
-        // Debug.LogFormat("Ball Diameter: {0}", _ballDiameter);
 
         return !Mathf.Approximately(_ballDiameter, prevBallDiameter);
     }
@@ -111,32 +102,9 @@ public class BallGrid : MonoBehaviour
         }
     }
 #endif
-    private void CreateBallGrid()
+    private void BallsCreate()
     {
-        // Clear all existing
-        // TODO: Stop clearing grid
-        ClearGrid();
-
-        // // TODO: Remove excess
-        // // if (_grid.Count > _maxRows) _grid.RemoveRange(_maxRows, _grid.Count - _maxRows);
-        // _grid.Capacity = _maxRows;
-        //
-        // for(var yIndex = _grid.Count; yIndex < _maxRows; yIndex++) {
-        //     var oddRow = hexagonalPacking && yIndex % 2 != 0;
-        //     var countForRow = ballsPerRow + 1;
-        //     if(hexagonalPacking && oddRow) {
-        //         countForRow -= 1;
-        //     }
-        //
-        //     var row = new List<BallController?>(countForRow);
-        //     _grid.Add(row);
-        // }
-    }
-
-    private void CreateBalls()
-    {
-        // _grid.FillRectangle(Vector2Int.zero, new Vector2Int(ballsPerRow - 5 - 1, rowCount), hex =>
-        _grid.FillRectangle(Vector2Int.zero, new Vector2Int(ballsPerRow-1 , rowCount - 1), hex =>
+        _grid.FillRectangle(Vector2Int.zero, new Vector2Int(ballsPerRow - 1, rowCount - 1), hex =>
         {
             var ball = CreateBall();
             ball.LockPosition(hex);
@@ -145,6 +113,14 @@ public class BallGrid : MonoBehaviour
         });
 
         Debug.Log("CreateBalls: Done");
+    }
+
+    private void BallReposition()
+    {
+        foreach(var (hex, value) in _grid.hexes)
+        {
+            value.LockPosition(hex);
+        }
     }
 
 
