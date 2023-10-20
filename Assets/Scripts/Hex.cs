@@ -19,11 +19,10 @@ public readonly struct FractionalHex {
     }
 
     // Axial
-    public FractionalHex(float q, float r)
-    {
+    public FractionalHex(float q, float r) {
         this.q = q;
         this.r = r;
-        this.s = -q - r;
+        s = -q - r;
     }
 
     public Hex Round() {
@@ -62,7 +61,8 @@ public readonly struct Hex {
     }
 
     // Axial
-    public Hex(int q, int r) : this(q, r, -q -r) { }
+    public Hex(int q, int r) : this(q, r, -q - r) {
+    }
 
     public Hex Add(Hex b) {
         return new Hex(q + b.q, r + b.r, s + b.s);
@@ -95,7 +95,7 @@ public readonly struct Hex {
     public static Hex Direction(int direction) {
         return directions[direction];
     }
-    
+
     public Hex Neighbor(int direction) {
         Assert.IsTrue(direction is >= 0 and < 6);
         return Add(Direction(direction));
@@ -110,11 +110,11 @@ public readonly struct Hex {
         Assert.IsTrue(direction is >= 0 and < 6);
         return Add(diagonals[direction]);
     }
-    
+
     public int Length() {
         return (Math.Abs(q) + Math.Abs(r) + Math.Abs(s)) / 2;
     }
-    
+
     public int Distance(Hex b) {
         return Subtract(b).Length();
     }
@@ -131,16 +131,14 @@ public readonly struct Hex {
         return new FractionalHex(q, r).Round();
     }
 
-    public override string ToString()
-    {
+    public override string ToString() {
         return $"Hex(q: {q}, r={r}, s={s})";
     }
 }
 
-readonly struct HexOrientation
-{
-    private HexOrientation(float qToX, float rToX, float qToY, float rToY, float xToQ, float yToQ, float xToR, float yToR, float startAngle)
-    {
+internal readonly struct HexOrientation {
+    private HexOrientation(float qToX, float rToX, float qToY, float rToY, float xToQ, float yToQ, float xToR,
+        float yToR, float startAngle) {
         this.qToX = qToX;
         this.rToX = rToX;
         this.qToY = qToY;
@@ -151,12 +149,13 @@ readonly struct HexOrientation
         this.yToR = yToR;
         this.startAngle = startAngle;
     }
+
     // Hex to pixel
     public readonly float qToX; // f0, q -> x
     public readonly float rToX; // f1, r -> x
     public readonly float qToY; // f2, q -> y
     public readonly float rToY; // f3, r -> y
-    
+
     // Pixel to Hex (inverted matrix of above)
     public readonly float xToQ; // b0
     public readonly float yToQ; // b1
@@ -170,32 +169,33 @@ readonly struct HexOrientation
 
     public static HexOrientation Pointy = new(Mathf.Sqrt(3.0f), Mathf.Sqrt(3.0f) / 2.0f, 0.0f, 3.0f / 2.0f,
         Mathf.Sqrt(3.0f) / 3.0f, -1.0f / 3.0f, 0.0f, 2.0f / 3.0f, 0.5f);
-    public static HexOrientation Flat = new(3.0f / 2.0f, 0.0f, Mathf.Sqrt(3.0f) / 2.0f, Mathf.Sqrt(3.0f), 2.0f / 3.0f, 0.0f, -1.0f / 3.0f, Mathf.Sqrt(3.0f) / 3.0f, 0.0f);
+
+    public static HexOrientation Flat = new(3.0f / 2.0f, 0.0f, Mathf.Sqrt(3.0f) / 2.0f, Mathf.Sqrt(3.0f), 2.0f / 3.0f,
+        0.0f, -1.0f / 3.0f, Mathf.Sqrt(3.0f) / 3.0f, 0.0f);
+
     public static HexOrientation Circular = new(2f, 1f, 0.0f, Mathf.Sqrt(3.0f),
         0.5f, -Mathf.Sqrt(3.0f) / 6, 0, 1 / Mathf.Sqrt(3.0f), 0.5f);
 }
 
-readonly struct HexLayout {
-    public HexLayout(HexOrientation orientation, Vector2 size, Vector2 origin)
-    {
+internal readonly struct HexLayout {
+    public HexLayout(HexOrientation orientation, Vector2 size, Vector2 origin) {
         this.orientation = orientation;
         this.size = size;
         this.origin = origin;
     }
+
     public readonly HexOrientation orientation;
     public readonly Vector2 size;
     public readonly Vector2 origin;
 
-    public Vector2 HexToPixel(Hex h)
-    {
+    public Vector2 HexToPixel(Hex h) {
         var x = (orientation.qToX * h.q + orientation.rToX * h.r) * size.x;
         var y = (orientation.qToY * h.q + orientation.rToY * h.r) * size.y;
         return new Vector2(x + origin.x, y + origin.y);
     }
 
 
-    public FractionalHex PixelToHex(Vector2 p)
-    {
+    public FractionalHex PixelToHex(Vector2 p) {
         var pt = new Vector2((p.x - origin.x) / size.x, (p.y - origin.y) / size.y);
         var q = orientation.xToQ * pt.x + orientation.yToQ * pt.y;
         var r = orientation.xToR * pt.x + orientation.yToR * pt.y;
@@ -203,31 +203,27 @@ readonly struct HexLayout {
     }
 
 
-    public Vector2 HexCornerOffset(int corner)
-    {
+    public Vector2 HexCornerOffset(int corner) {
         var M = orientation;
         var angle = 2.0f * Mathf.PI * (M.startAngle - corner) / 6.0f;
         return new Vector2(size.x * Mathf.Cos(angle), size.y * Mathf.Sin(angle));
     }
 
 
-    public List<Vector2> PolygonCorners(Hex h)
-    {
-        var corners = new List<Vector2>{};
+    public List<Vector2> PolygonCorners(Hex h) {
+        var corners = new List<Vector2>();
         var center = HexToPixel(h);
-        for (int i = 0; i < 6; i++)
-        {
-            Vector2 offset = HexCornerOffset(i);
+        for(var i = 0; i < 6; i++) {
+            var offset = HexCornerOffset(i);
             corners.Add(new Vector2(center.x + offset.x, center.y + offset.y));
         }
+
         return corners;
     }
 }
 
 public class HexMap<T> {
     public readonly Dictionary<Hex, T> hexes = new();
-
-    public HexMap() { }
 
     public void FillRectangle(Vector2Int topLeft, Vector2Int bottomRight, Func<Hex, T> f) {
         for(var r = topLeft.y; r <= bottomRight.y; r++) { // pointy top

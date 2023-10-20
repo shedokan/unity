@@ -8,14 +8,14 @@ public class PlayerController : MonoBehaviour {
     public GameObject projectileParent;
     public float shootThrust = 5000; // Should be positive
 
-    private Camera _mainCamera;
-    private RectTransform _rectTransform;
-    private RectTransform _pivotRectTransform;
-    private Vector2 _offset;
     private Ray2D _aimRay;
+    private Camera _mainCamera;
+    private Vector2 _offset;
+    private RectTransform _pivotRectTransform;
+    private RectTransform _rectTransform;
 
     // Start is called before the first frame update
-    void Start() {
+    private void Start() {
         _mainCamera = Camera.main;
         _rectTransform = GetComponent<RectTransform>();
 
@@ -32,7 +32,21 @@ public class PlayerController : MonoBehaviour {
         Assert.IsNotNull(rb2D);
     }
 
-    void OnGUI() {
+    // Update is called once per frame
+    private void FixedUpdate() {
+        // TODO: Support touch
+        var mouse = Mouse.current;
+        if(mouse is null || !mouse.wasUpdatedThisFrame) return;
+
+        var pivotAroundPos = _pivotRectTransform.position;
+        Vector3 mouse3d = mouse.position.value;
+        mouse3d.z = pivotAroundPos.z;
+        var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
+
+        _aimRay = LookAt(mouseWorld, pivotAroundPos);
+    }
+
+    private void OnGUI() {
         var mouse = Mouse.current.position.value;
         Vector3 mouse3d = mouse;
         mouse3d.z = 100;
@@ -58,22 +72,7 @@ Distance: {Vector2.Distance(position, mouseWorld)}
 ");
     }
 
-    // Update is called once per frame
-    private void FixedUpdate() {
-        // TODO: Support touch
-        var mouse = Mouse.current;
-        if(mouse is null || !mouse.wasUpdatedThisFrame) return;
-
-        var pivotAroundPos = _pivotRectTransform.position;
-        Vector3 mouse3d = mouse.position.value;
-        mouse3d.z = pivotAroundPos.z;
-        var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
-
-        _aimRay = LookAt(mouseWorld, pivotAroundPos);
-    }
-
-    private void OnFire(InputValue value)
-    {
+    private void OnFire(InputValue value) {
         var hit = Physics2D.Raycast(_aimRay.origin, _aimRay.direction);
         if(!hit) return;
         Debug.DrawLine(_aimRay.origin, hit.point, Color.red, 2);
@@ -97,7 +96,7 @@ Distance: {Vector2.Distance(position, mouseWorld)}
         // TODO: Maybe replace with Vector2.Angle()
         var angle = Angle(moveDirection);
 
-        angle = (angle >= 90.0f) ? angle - 90.0f : 270.0f + angle;
+        angle = angle >= 90.0f ? angle - 90.0f : 270.0f + angle;
         var angleAxis = Quaternion.AngleAxis(angle, Vector3.forward);
         _rectTransform.rotation = angleAxis;
 
@@ -112,10 +111,12 @@ Distance: {Vector2.Distance(position, mouseWorld)}
         return lookingRay;
     }
 
-    // Return the angle in degrees of vector v relative to the x-axis. 
-    // Angles are towards the positive y-axis (typically counter-clockwise) and between 0 and 360.
+    /// <returns>
+    ///     The angle in degrees of <paramref name="v" /> relative to the x-axis.
+    ///     Angles are towards the positive y-axis (typically counter-clockwise) and between 0 and 360.
+    /// </returns>
     private static float Angle(Vector2 v) {
-        var angle = (float)Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
+        var angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
         if(angle < 0) angle += 360;
         return angle;
     }
