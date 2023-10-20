@@ -53,7 +53,6 @@ public class BallController : MonoBehaviour {
         return Colors[randIndex];
     }
 
-    [UsedImplicitly]
     public Vector2 LockPosition(Hex newHex, bool skipReposition = false) {
         hexCoords = newHex;
         targetJoint2D.enabled = true;
@@ -77,7 +76,11 @@ public class BallController : MonoBehaviour {
     private void StopMoving() {
         var ballGrid = BallGrid.current;
         var newHex = ballGrid.WorldPosToHex(transform.position).Round();
-        newHex = ballGrid.PlaceGameObject(newHex, this);
+        if(!ballGrid.TryToPlaceBall(ref newHex, this)) {
+            Destroy(gameObject);
+            Debug.LogWarning($"Couldn't find place for ball in {newHex}, destroyed it instead");
+            return;
+        }
 
         var pos = LockPosition(newHex);
         var worldPos = ballGrid.transform.TransformPoint(pos);

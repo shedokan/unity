@@ -152,24 +152,31 @@ public class BallGrid : MonoBehaviour {
         return pos;
     }
 
-    public Hex PlaceGameObject(Hex hex, BallController ballController) {
+    /// <summary>
+    ///     Tries to place the <paramref name="ball" /> in <paramref name="hex" />
+    ///     If it can't tries to position it in one of the neighbours and updates <paramref name="hex" />
+    /// </summary>
+    /// <param name="hex">Placement coordinates</param>
+    /// <param name="ballController">Controller of the ball to place</param>
+    /// <returns>True if successful</returns>
+    public bool TryToPlaceBall(ref Hex hex, BallController ballController) {
         var canPlace = !_grid.hexes.ContainsKey(hex);
         // Find a different place
         if(!canPlace)
             foreach(var direction in Hex.directions) {
-                var newHex = hex.Add(direction);
-                canPlace = !_grid.hexes.ContainsKey(newHex);
+                var hexInDir = hex.Add(direction);
+                canPlace = !_grid.hexes.ContainsKey(hexInDir);
                 if(canPlace) {
-                    hex = newHex;
+                    hex = hexInDir;
                     break;
                 }
             }
 
-        Assert.IsTrue(canPlace, $"Can't place: {hex}");
+        if(!canPlace) return false;
 
         _grid.hexes.Add(hex, ballController);
 
-        return hex;
+        return true;
     }
 
     public void RemoveGameObject(Hex hex) {
