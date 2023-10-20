@@ -43,17 +43,17 @@ public class PlayerController : MonoBehaviour {
         var pivotPosition = _pivotRectTransform.position;
 
         if(!BallGrid.current) return;
-        var gridRectTransform = BallGrid.current.GetComponent<RectTransform>();
-        var coord = BallGrid.current.PosToOffset(mouseWorld);
+        var mouseHex = BallGrid.current.PosToHex(mouseWorld);
         var roundedGrid = BallGrid.current.RoundToNearestGrid(mouseWorld);
+        var gridRectTransform = BallGrid.current.GetComponent<RectTransform>();
         GUI.Box(new Rect(5, 25, 400, 100), "");
         //The Labels show what the Sliders represent
         GUI.Label(new Rect(10, 30, 400, 200), $@"Mouse(World) X: {mouseWorld.x}, Y: {mouseWorld.y}, Z: {mouseWorld.z}
+Mouse(Hex): Q: {mouseHex.q}, R: {mouseHex.r}
+Mouse(Rounded) X: {roundedGrid.x}, Col: {roundedGrid.y}
 This X: {position.x}, Y : {position.y}, Z: {position.z}
 ballGrid X: {gridRectTransform.worldToLocalMatrix * mouseWorld}
 Pivot X: {pivotPosition.x}, Y : {pivotPosition.y}, Z: {pivotPosition.z}
-Hex Col: {coord.x}, Row: {coord.y}
-Rounded X: {roundedGrid.x}, Col: {roundedGrid.y}
 Distance: {Vector2.Distance(position, mouseWorld)}
 ");
     }
@@ -72,11 +72,13 @@ Distance: {Vector2.Distance(position, mouseWorld)}
         _aimRay = LookAt(mouseWorld, pivotAroundPos);
     }
 
-    private void OnFire(InputValue value) {
+    private void OnFire(InputValue value)
+    {
         var hit = Physics2D.Raycast(_aimRay.origin, _aimRay.direction);
         if(!hit) return;
-        Debug.DrawLine(_aimRay.origin, hit.point, Color.red);
+        Debug.DrawLine(_aimRay.origin, hit.point, Color.red, 2);
 
+        return;
         ShootBall(_aimRay);
     }
 

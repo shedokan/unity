@@ -17,7 +17,7 @@ public class BallController : MonoBehaviour {
     }
 
     private Color _color;
-    public Color Color {
+    public Color color {
         get => _color;
         set {
             var spriteRenderer = GetComponent<SpriteRenderer>();
@@ -25,9 +25,9 @@ public class BallController : MonoBehaviour {
         }
     }
     
-    public Vector2Int? coord;
+    private Hex? _hexCoords;
 
-    private bool moving => coord is not null;
+    private bool moving => _hexCoords is null;
     private TargetJoint2D _targetJoint2D;
 
     private TargetJoint2D targetJoint2D {
@@ -48,30 +48,36 @@ public class BallController : MonoBehaviour {
     void Update() { }
 
     [UsedImplicitly]
-    void ResetBall(Color color, Vector2Int newCoord) {
-        Color = color;
-        coord = newCoord;
-        
+    public Vector2 LockPosition(Hex newHex) {
+        _hexCoords = newHex;
         targetJoint2D.enabled = true;
+
+        var pos = BallGrid.current.PosInGrid(newHex);
+        Debug.Log($"LockPosition({newHex}: {pos}");
+        transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
+        // transform.position = pos;
+
+        
+        // targetJoint2D.autoConfigureTarget = false;
+        // targetJoint2D.target =  BallGrid.current.transform.TransformPoint(pos);;
+        
+        return pos;
     }
 
     [UsedImplicitly]
-    void StartMoving(Color color) {
-        Color = color;
-        coord = null;
+    void StartMoving(Color color_) {
+        this.color = color_;
+        _hexCoords = null;
 
         targetJoint2D.enabled = false;
     }
 
     void StopMoving() {
-        targetJoint2D.autoConfigureTarget = false;
-        var newCoord = BallGrid.current.PosToOffset(transform.position);
-        BallGrid.current.PlaceGameObject(newCoord, this);
-        targetJoint2D.target = BallGrid.current.PosInGrid(newCoord);
+        var newHex = BallGrid.current.PosToHex(transform.position).Round();
+        newHex = BallGrid.current.PlaceGameObject(newHex, this);
         // TODO: Add to grid
-        targetJoint2D.enabled = true;
 
-        coord = newCoord;
+        var pos = LockPosition(newHex);
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
@@ -86,6 +92,8 @@ public class BallController : MonoBehaviour {
         // }
 
         StopMoving();
+        
+        Debug.Log("sdasd");
 
 
         // var colliderBallController = collision.collider.gameObject.GetComponent<BallController>();
@@ -100,9 +108,5 @@ public class BallController : MonoBehaviour {
 
         // if (collision.relativeVelocity.magnitude > 2)
         //     audioSource.Play();
-    }
-
-    public void Reposition(Vector2 pos) {
-        transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
     }
 }
