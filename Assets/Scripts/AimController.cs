@@ -81,7 +81,9 @@ Distance: {Vector2.Distance(position, mouseWorld)}
 #if UNITY_EDITOR
     private void OnRectTransformDimensionsChange() {
         if(_currProjectile) {
-            // TODO: Reposition projectile
+            var projTransform = _currProjectile.transform;
+            projTransform.position = _rectTransform.position;
+            projTransform.localScale = projectilePrefab.transform.localScale;
         }
     }
 #endif
