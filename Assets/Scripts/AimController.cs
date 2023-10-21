@@ -16,8 +16,9 @@ public class AimController : MonoBehaviour {
     public float shootThrust = 5000; // Should be positive
 
     private Ray2D _aimRay;
+    private BallController _currProjectile;
     private Camera _mainCamera;
-    private Vector2 _offset;
+    private Vector2 _pointerOffset;
     private RectTransform _pointerRectTransform;
     private RectTransform _rectTransform;
 
@@ -28,11 +29,13 @@ public class AimController : MonoBehaviour {
 
         if(pointer) {
             _pointerRectTransform = pointer.GetComponent<RectTransform>();
-            _offset = _pointerRectTransform.position - _rectTransform.position;
+            _pointerOffset = _pointerRectTransform.position - _rectTransform.position;
         }
 
         var rb2D = projectilePrefab.GetComponent<Rigidbody2D>();
         Assert.IsNotNull(rb2D);
+
+        _currProjectile = NewProjectile();
     }
 
     // Update is called once per frame
@@ -75,12 +78,22 @@ Distance: {Vector2.Distance(position, mouseWorld)}
 ");
     }
 
+#if UNITY_EDITOR
+    private void OnRectTransformDimensionsChange() {
+        if(_currProjectile) {
+            // TODO: Reposition projectile
+        }
+    }
+#endif
+
     private void OnFire(InputValue value) {
         var hit = Physics2D.Raycast(_aimRay.origin, _aimRay.direction);
         if(!hit) return;
         Debug.DrawLine(_aimRay.origin, hit.point, Color.red, 2);
 
-        ShootBall(_aimRay);
+        ShootProjectile(_aimRay);
+
+        _currProjectile = NewProjectile();
     }
 
     /// <summary>
@@ -97,7 +110,7 @@ Distance: {Vector2.Distance(position, mouseWorld)}
         var lookingRay = new Ray2D(myWorldPos, angleAxis * Vector2.up);
 
         if(pointer) {
-            var point = lookingRay.GetPoint(_offset.magnitude);
+            var point = lookingRay.GetPoint(_pointerOffset.magnitude);
             _pointerRectTransform.SetPositionAndRotation(
                 new Vector3(point.x, point.y, _pointerRectTransform.position.z),
                 angleAxis);
@@ -106,17 +119,23 @@ Distance: {Vector2.Distance(position, mouseWorld)}
         return lookingRay;
     }
 
+    private BallController NewProjectile() {
+        var projectile = Instantiate(projectilePrefab, _rectTransform.position, _rectTransform.rotation,
+            projectileParent.transform);
+        projectile.layer = Layers.Aimer;
+
+        var ballController = projectile.GetComponent<BallController>();
+        ballController.color = BallController.RandomColor();
+
+        return ballController;
+    }
+
     /// <summary>
     /// </summary>
     /// <param name="ray"></param>
-    private void ShootBall(Ray2D ray) {
-        if(!projectilePrefab) return;
+    private void ShootProjectile(Ray2D ray) {
+        if(!_currProjectile) return;
 
-        var ball = Instantiate(projectilePrefab, _rectTransform.position, _rectTransform.rotation,
-            projectileParent.transform);
-        ball.SendMessage("StartMoving", BallController.RandomColor());
-
-        var rb2D = ball.GetComponent<Rigidbody2D>();
-        rb2D.AddForce(ray.direction * shootThrust);
+        _currProjectile.Shoot(ray.direction * shootThrust);
     }
 }

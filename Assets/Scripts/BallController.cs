@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -65,15 +64,19 @@ public class BallController : MonoBehaviour {
         return pos;
     }
 
-    [UsedImplicitly]
-    private void StartMoving(Color color_) {
-        color = color_;
+    public void Shoot(Vector2 force) {
+        gameObject.layer = Layers.MovingBalls;
         hexCoords = null;
 
         targetJoint2D.enabled = false;
+
+        var rb2D = GetComponent<Rigidbody2D>();
+        rb2D.AddForce(force);
     }
 
     private void StopMoving() {
+        gameObject.layer = Layers.IdleBalls;
+
         var ballGrid = BallGrid.current;
         var newHex = ballGrid.WorldPosToHex(transform.position).Round();
         if(!ballGrid.TryToPlaceBall(ref newHex, this)) {
@@ -105,5 +108,6 @@ public class BallController : MonoBehaviour {
         }
 
         _dropped = true;
+        gameObject.layer = Layers.Falling;
     }
 }
