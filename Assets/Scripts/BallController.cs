@@ -102,11 +102,6 @@ public class BallController : MonoBehaviour {
         targetJoint2D.enabled = false;
         _rigidBody2d.gravityScale = 5;
 
-
-        // TODO: Collide only with the dead zone
-        // TODO: Don't let other balls collide with this one
-        // GetComponent<Collider2D>().enabled = false;
-
         if(hexCoords is { } hex) {
             BallGrid.current.RemoveGameObject(hex);
             hexCoords = null;
