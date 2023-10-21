@@ -32,8 +32,8 @@ public class AimController : MonoBehaviour {
             _pointerOffset = _pointerRectTransform.position - _rectTransform.position;
         }
 
-        var rb2D = projectilePrefab.GetComponent<Rigidbody2D>();
-        Assert.IsNotNull(rb2D);
+        var ballController = projectilePrefab.GetComponent<BallController>();
+        Assert.IsNotNull(ballController);
 
         _currProjectile = NewProjectile();
     }

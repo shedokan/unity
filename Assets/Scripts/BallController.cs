@@ -12,9 +12,8 @@ public class BallController : MonoBehaviour {
 
     private Color _color;
     private bool _dropped;
-
-    // Note: Auto reconfigure target is useful fo recalculation
-    private TargetJoint2D _targetJoint2D;
+    private Rigidbody2D _rigidBody2d;
+    private TargetJoint2D _targetJoint2D; // Note: Auto reconfigure target is useful fo recalculation
 
     public Hex? hexCoords { get; private set; }
 
@@ -26,8 +25,7 @@ public class BallController : MonoBehaviour {
         }
     }
 
-    private bool moving => hexCoords is null;
-
+    // Can't initialize on Start() due to usage before Start()
     private TargetJoint2D targetJoint2D {
         get {
             if(!_targetJoint2D) {
@@ -39,12 +37,19 @@ public class BallController : MonoBehaviour {
         }
     }
 
+    private bool moving => hexCoords is null;
+
+    private void Start() {
+        _rigidBody2d = GetComponent<Rigidbody2D>();
+        Assert.IsNotNull(_rigidBody2d);
+    }
+
     private void OnCollisionEnter2D(Collision2D collision) {
         if(!moving || _dropped || !collision.collider.CompareTag("Ball")) return;
 
         Debug.Log($"OnCollisionEnter2D, collider tag: {collision.collider}");
 
-        StopMoving();
+        HitBall();
     }
 
     public static Color RandomColor() {
@@ -70,11 +75,10 @@ public class BallController : MonoBehaviour {
 
         targetJoint2D.enabled = false;
 
-        var rb2D = GetComponent<Rigidbody2D>();
-        rb2D.AddForce(force);
+        _rigidBody2d.AddForce(force);
     }
 
-    private void StopMoving() {
+    private void HitBall() {
         gameObject.layer = Layers.IdleBalls;
 
         var ballGrid = BallGrid.current;
@@ -89,13 +93,14 @@ public class BallController : MonoBehaviour {
         var worldPos = ballGrid.transform.TransformPoint(pos);
         targetJoint2D.target = worldPos;
 
+        _rigidBody2d.velocity = Vector2.zero;
+
         ballGrid.CheckHit(newHex, color);
     }
 
     public void Drop() {
-        _targetJoint2D.enabled = false;
-        var rigidBody = GetComponent<Rigidbody2D>();
-        rigidBody.gravityScale = 1;
+        targetJoint2D.enabled = false;
+        _rigidBody2d.gravityScale = 5;
 
 
         // TODO: Collide only with the dead zone

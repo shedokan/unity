@@ -219,6 +219,8 @@ public class BallGrid : MonoBehaviour {
         Debug.Log($"countSame: {same.Count}");
         foreach(var hex in same) _grid.hexes[hex].Drop();
 
+        // TODO: Find floating
+
         return true;
     }
 }
