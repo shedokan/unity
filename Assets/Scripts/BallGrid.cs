@@ -83,6 +83,7 @@ public class BallGrid : MonoBehaviour {
     }
 
     private void BallsCreate() {
+        // TODO: Consider replacing with iterator
         _grid.FillRectangle(Vector2Int.zero, new Vector2Int(ballsPerRow - 1, rowCount - 1), hex => {
             var ball = CreateBall();
             ball.LockPosition(hex);
@@ -152,7 +153,7 @@ public class BallGrid : MonoBehaviour {
     }
 
     /// <summary>
-    ///     Tries to place the <paramref name="ball" /> in <paramref name="hex" />
+    ///     Tries to place the <paramref name="ballController" /> in <paramref name="hex" />
     ///     If it can't tries to position it in one of the neighbours and updates <paramref name="hex" />
     /// </summary>
     /// <param name="hex">Placement coordinates</param>
@@ -201,25 +202,7 @@ public class BallGrid : MonoBehaviour {
 
     private HashSet<Hex> FindHitGroup(Hex origHex, Color colorFilter) {
         HashSet<Hex> same = new();
-        HashSet<Hex> visited = new();
-        Queue<Hex> toVisit = new();
-        toVisit.Enqueue(origHex);
-
-        while(toVisit.Count > 0) {
-            var hex = toVisit.Dequeue();
-            if(visited.Contains(hex)) continue;
-
-            same.Add(hex);
-            visited.Add(hex);
-
-            foreach(var hexInDir in hex.DirectionsEnumerator()) {
-                if(visited.Contains(hexInDir) || toVisit.Contains(hexInDir)) continue;
-
-                // Add all directions
-                if(_grid.hexes.TryGetValue(hexInDir, out var currBall) && currBall.color == colorFilter) {
-                    toVisit.Enqueue(hexInDir);
-                }
-            }
+        foreach(var _ in _grid.FloodFill(origHex, same, currBall => currBall.color == colorFilter)) {
         }
 
         return same;
@@ -229,7 +212,7 @@ public class BallGrid : MonoBehaviour {
     ///     Finds and drops floating groups around the <paramref name="hitGroup" />
     /// </summary>
     /// <param name="hitGroup"></param>
-    private void DropFloating(HashSet<Hex> hitGroup) {
+    private void DropFloating(ICollection<Hex> hitGroup) {
         // Add all nodes around the group
         HashSet<Hex> groupSeeds = new();
         foreach(var groupHex in hitGroup)
@@ -242,27 +225,10 @@ public class BallGrid : MonoBehaviour {
         foreach(var seedHex in groupSeeds) {
             if(visited.Contains(seedHex)) continue;
 
-            HashSet<Hex> visitedInGroup = new();
-            Queue<Hex> toVisit = new();
-            toVisit.Enqueue(seedHex);
-
             var connectedToTop = false;
-            while(toVisit.Count > 0) {
-                var currHex = toVisit.Dequeue();
-                if(visited.Contains(currHex)) continue;
 
-                visited.Add(currHex);
-                visitedInGroup.Add(currHex);
-
-                // Add all directions
-                foreach(var hexInDir in currHex.DirectionsEnumerator()) {
-                    if(visited.Contains(hexInDir) || toVisit.Contains(hexInDir) || !_grid.hexes.ContainsKey(hexInDir)) {
-                        continue;
-                    }
-
-                    toVisit.Enqueue(hexInDir);
-                }
-
+            HashSet<Hex> visitedInGroup = new();
+            foreach(var currHex in _grid.FloodFill(seedHex, visitedInGroup, visited)) {
                 if(currHex.r == 0) connectedToTop = true;
             }
 

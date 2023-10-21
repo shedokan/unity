@@ -246,4 +246,38 @@ public class HexMap<T> {
             }
         }
     }
+
+
+    public IEnumerable<Hex> FloodFill(Hex start, ISet<Hex> filled,
+        Func<T, bool> filterFn = null) {
+        HashSet<Hex> visited = new();
+        return FloodFill(start, filled, visited, filterFn);
+    }
+
+    public IEnumerable<Hex> FloodFill(Hex start, ISet<Hex> filled, ISet<Hex> visited,
+        Func<T, bool> filterFn = null) {
+        Queue<Hex> toVisit = new();
+        toVisit.Enqueue(start);
+
+        while(toVisit.Count > 0) {
+            var hex = toVisit.Dequeue();
+            if(visited.Contains(hex)) continue;
+
+            filled.Add(hex);
+            visited.Add(hex);
+
+            // Add all directions
+            foreach(var hexInDir in hex.DirectionsEnumerator()) {
+                if(visited.Contains(hexInDir) || toVisit.Contains(hexInDir)) continue;
+
+                var validHex = filterFn is null
+                    ? hexes.ContainsKey(hexInDir)
+                    : hexes.TryGetValue(hexInDir, out var value) && filterFn(value);
+                if(!validHex) continue;
+
+                toVisit.Enqueue(hexInDir);
+                yield return hexInDir;
+            }
+        }
+    }
 }
