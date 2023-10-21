@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -91,6 +92,14 @@ public readonly struct Hex {
     public static readonly List<Hex> directions = new(6) {
         new Hex(1, 0, -1), new Hex(1, -1, 0), new Hex(0, -1, 1), new Hex(-1, 0, 1), new Hex(-1, 1, 0), new Hex(0, 1, -1)
     };
+
+    public IEnumerable<Hex> DirectionsEnumerator() {
+        return directions.Select(Add);
+    }
+
+    public static IEnumerable<Hex> DirectionsEnumerator(Hex origin) {
+        return origin.DirectionsEnumerator();
+    }
 
     public static Hex Direction(int direction) {
         return directions[direction];

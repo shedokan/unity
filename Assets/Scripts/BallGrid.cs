@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -186,41 +185,94 @@ public class BallGrid : MonoBehaviour {
     /// <summary>
     ///     Checks if there is a group of balls of the same color that is more than the threshold
     /// </summary>
-    /// <param name="origHex">Starting coordinates</param>
+    /// <param name="startHex">Starting coordinates</param>
     /// <param name="color">Color to filter</param>
     /// <returns>true if there was a hit</returns>
-    public bool CheckHit(Hex origHex, Color color) {
-        HashSet<Hex> visited = new();
+    public void CheckHit(Hex startHex, Color color) {
+        var hitGroup = FindHitGroup(startHex, color);
+
+        var overThreshold = hitGroup.Count >= groupHitThreshold;
+        if(!overThreshold) return;
+
+        foreach(var hex in hitGroup) _grid.hexes[hex].Drop();
+
+        DropFloating(hitGroup);
+    }
+
+    private HashSet<Hex> FindHitGroup(Hex origHex, Color colorFilter) {
         HashSet<Hex> same = new();
+        HashSet<Hex> visited = new();
         Queue<Hex> toVisit = new();
         toVisit.Enqueue(origHex);
 
         while(toVisit.Count > 0) {
             var hex = toVisit.Dequeue();
+            if(visited.Contains(hex)) continue;
+
             same.Add(hex);
             visited.Add(hex);
 
-            foreach(var hexInDir in Hex.directions.Select(dir => hex.Add(dir))) {
-                if(visited.Contains(hexInDir)) continue;
+            foreach(var hexInDir in hex.DirectionsEnumerator()) {
+                if(visited.Contains(hexInDir) || toVisit.Contains(hexInDir)) continue;
 
-                if(_grid.hexes.TryGetValue(hexInDir, out var currBall) && currBall.color == color) {
+                // Add all directions
+                if(_grid.hexes.TryGetValue(hexInDir, out var currBall) && currBall.color == colorFilter) {
                     toVisit.Enqueue(hexInDir);
-                    continue;
                 }
-
-                // Add it to avoid fetching it again from grid
-                visited.Add(hexInDir);
             }
         }
 
-        var overThreshold = same.Count >= groupHitThreshold;
-        if(!overThreshold) return false;
+        return same;
+    }
 
-        Debug.Log($"countSame: {same.Count}");
-        foreach(var hex in same) _grid.hexes[hex].Drop();
+    /// <summary>
+    ///     Finds and drops floating groups around the <paramref name="hitGroup" />
+    /// </summary>
+    /// <param name="hitGroup"></param>
+    private void DropFloating(HashSet<Hex> hitGroup) {
+        // Add all nodes around the group
+        HashSet<Hex> groupSeeds = new();
+        foreach(var groupHex in hitGroup)
+        foreach(var hexInDir in groupHex.DirectionsEnumerator())
+            if(_grid.hexes.ContainsKey(hexInDir) && !hitGroup.Contains(hexInDir))
+                groupSeeds.Add(hexInDir);
 
-        // TODO: Find floating
+        // For each group
+        HashSet<Hex> visited = new();
+        foreach(var seedHex in groupSeeds) {
+            if(visited.Contains(seedHex)) continue;
 
-        return true;
+            HashSet<Hex> visitedInGroup = new();
+            Queue<Hex> toVisit = new();
+            toVisit.Enqueue(seedHex);
+
+            var connectedToTop = false;
+            while(toVisit.Count > 0) {
+                var currHex = toVisit.Dequeue();
+                if(visited.Contains(currHex)) continue;
+
+                visited.Add(currHex);
+                visitedInGroup.Add(currHex);
+
+                // Add all directions
+                foreach(var hexInDir in currHex.DirectionsEnumerator()) {
+                    if(visited.Contains(hexInDir) || toVisit.Contains(hexInDir) || !_grid.hexes.ContainsKey(hexInDir)) {
+                        continue;
+                    }
+
+                    toVisit.Enqueue(hexInDir);
+                }
+
+                if(currHex.r == 0) connectedToTop = true;
+            }
+
+            // Debug.Log(
+            //     $"seedHex: {seedHex}, connectedToTop: {connectedToTop}, visitedInGroup.Count: {visitedInGroup.Count}");
+
+            // Keep connected
+            if(connectedToTop) continue;
+
+            foreach(var hex in visitedInGroup) _grid.hexes[hex].Drop();
+        }
     }
 }
