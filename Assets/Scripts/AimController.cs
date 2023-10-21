@@ -2,16 +2,23 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour {
-    public GameObject pivotAround;
-    public GameObject projectile;
+/// <summary>Add to aim center</summary>
+public class AimController : MonoBehaviour {
+    /// <summary>Object used to show direction</summary>
+    public GameObject pointer;
+
+    /// <summary>Prefab used to shoot</summary>
+    public GameObject projectilePrefab;
+
+    /// <summary>Where to add the projectile upon shooting</summary>
     public GameObject projectileParent;
+
     public float shootThrust = 5000; // Should be positive
 
     private Ray2D _aimRay;
     private Camera _mainCamera;
     private Vector2 _offset;
-    private RectTransform _pivotRectTransform;
+    private RectTransform _pointerRectTransform;
     private RectTransform _rectTransform;
 
     // Start is called before the first frame update
@@ -19,16 +26,12 @@ public class PlayerController : MonoBehaviour {
         _mainCamera = Camera.main;
         _rectTransform = GetComponent<RectTransform>();
 
-        if(pivotAround) {
-            _pivotRectTransform = pivotAround.GetComponent<RectTransform>();
-            _offset = _rectTransform.position - _pivotRectTransform.position;
-        }
-        else {
-            pivotAround = gameObject;
-            _pivotRectTransform = _rectTransform;
+        if(pointer) {
+            _pointerRectTransform = pointer.GetComponent<RectTransform>();
+            _offset = _pointerRectTransform.position - _rectTransform.position;
         }
 
-        var rb2D = projectile.GetComponent<Rigidbody2D>();
+        var rb2D = projectilePrefab.GetComponent<Rigidbody2D>();
         Assert.IsNotNull(rb2D);
     }
 
@@ -38,12 +41,12 @@ public class PlayerController : MonoBehaviour {
         var mouse = Mouse.current;
         if(mouse is null || !mouse.wasUpdatedThisFrame) return;
 
-        var pivotAroundPos = _pivotRectTransform.position;
+        var pivotPos = _rectTransform.position;
         Vector3 mouse3d = mouse.position.value;
-        mouse3d.z = pivotAroundPos.z;
+        mouse3d.z = pivotPos.z;
         var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
 
-        _aimRay = LookAt(mouseWorld, pivotAroundPos);
+        _aimRay = PointAt(pivotPos, mouseWorld);
     }
 
     private void OnGUI() {
@@ -53,8 +56,8 @@ public class PlayerController : MonoBehaviour {
 
         var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
 
-        var position = _rectTransform.position;
-        var pivotPosition = _pivotRectTransform.position;
+        var position = _pointerRectTransform.position;
+        var pivotPosition = _rectTransform.position;
 
         if(!BallGrid.current) return;
         var mouseHex = BallGrid.current.WorldPosToHex(mouseWorld);
@@ -80,44 +83,40 @@ Distance: {Vector2.Distance(position, mouseWorld)}
         ShootBall(_aimRay);
     }
 
-    private void ShootBall(Ray2D ray) {
-        if(!projectile) return;
+    /// <summary>
+    ///     Points the <see cref="pointer" /> towards <paramref name="targetWorldPos" />
+    ///     and returns a 2D ray towards it
+    /// </summary>
+    /// <param name="myWorldPos">Pivot to point at (world coordinates)</param>
+    /// <param name="targetWorldPos">Target to point at (world coordinates)</param>
+    /// <returns>A ray from <paramref name="myWorldPos" /> to <paramref name="targetWorldPos" /></returns>
+    private Ray2D PointAt(Vector2 myWorldPos, Vector2 targetWorldPos) {
+        var moveDirection = targetWorldPos - myWorldPos;
+        var angle = Vector2.SignedAngle(Vector2.up, moveDirection);
+        var angleAxis = Quaternion.AngleAxis(angle, Vector3.forward);
+        var lookingRay = new Ray2D(myWorldPos, angleAxis * Vector2.up);
 
-        var ball = Instantiate(projectile, _rectTransform.position, _rectTransform.rotation,
+        if(pointer) {
+            var point = lookingRay.GetPoint(_offset.magnitude);
+            _pointerRectTransform.SetPositionAndRotation(
+                new Vector3(point.x, point.y, _pointerRectTransform.position.z),
+                angleAxis);
+        }
+
+        return lookingRay;
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="ray"></param>
+    private void ShootBall(Ray2D ray) {
+        if(!projectilePrefab) return;
+
+        var ball = Instantiate(projectilePrefab, _rectTransform.position, _rectTransform.rotation,
             projectileParent.transform);
         ball.SendMessage("StartMoving", BallController.RandomColor());
 
         var rb2D = ball.GetComponent<Rigidbody2D>();
         rb2D.AddForce(ray.direction * shootThrust);
-    }
-
-    private Ray2D LookAt(Vector2 target, Vector2 pivotAroundPos) {
-        var moveDirection = target - pivotAroundPos;
-        // TODO: Maybe replace with Vector2.Angle()
-        var angle = Angle(moveDirection);
-
-        angle = angle >= 90.0f ? angle - 90.0f : 270.0f + angle;
-        var angleAxis = Quaternion.AngleAxis(angle, Vector3.forward);
-        _rectTransform.rotation = angleAxis;
-
-        var lookingRay = new Ray2D(pivotAroundPos, angleAxis * Vector2.up);
-
-
-        if(pivotAround == gameObject) return lookingRay;
-
-        var point = lookingRay.GetPoint(_offset.magnitude);
-        _rectTransform.position = new Vector3(point.x, point.y, _rectTransform.position.z);
-
-        return lookingRay;
-    }
-
-    /// <returns>
-    ///     The angle in degrees of <paramref name="v" /> relative to the x-axis.
-    ///     Angles are towards the positive y-axis (typically counter-clockwise) and between 0 and 360.
-    /// </returns>
-    private static float Angle(Vector2 v) {
-        var angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
-        if(angle < 0) angle += 360;
-        return angle;
     }
 }
