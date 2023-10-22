@@ -1,5 +1,5 @@
 {
-    "name": "New Controls",
+    "name": "Player Controls",
     "maps": [
         {
             "name": "Aimer",
@@ -20,7 +20,7 @@
                     "name": "",
                     "id": "25e85bd9-1e9f-43ef-b977-eb13057d1e77",
                     "path": "<Pointer>/press",
-                    "interactions": "",
+                    "interactions": "Press(behavior=1)",
                     "processors": "",
                     "groups": "",
                     "action": "Fire",

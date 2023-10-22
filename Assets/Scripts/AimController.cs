@@ -36,41 +36,27 @@ public class AimController : MonoBehaviour {
 
     // Update is called once per frame
     private void FixedUpdate() {
-        // TODO: Support touch
-        var mouse = Mouse.current;
-        if(mouse is null || !mouse.wasUpdatedThisFrame) return;
-
-        var pivotPos = _rectTransform.position;
-        Vector3 mouse3d = mouse.position.value;
-        mouse3d.z = pivotPos.z;
-        var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
-
-        _aimRay = PointAt(pivotPos, mouseWorld);
+        var pointerWorld = PointerWorldPos();
+        if(pointerWorld is not null) {
+            _aimRay = PointAt(_rectTransform.position, (Vector2)pointerWorld);
+        }
     }
 
     private void OnGUI() {
-        var mouse = Mouse.current.position.value;
-        Vector3 mouse3d = mouse;
-        mouse3d.z = 100;
-
-        var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
-
-        var position = pointer.position;
-        var pivotPosition = _rectTransform.position;
+        var pointerWorldPos = PointerWorldPos() ?? Vector2.zero;
 
         if(!BallGrid.current) return;
-        var mouseHex = BallGrid.current.WorldPosToHex(mouseWorld);
-        var roundedGrid = BallGrid.current.RoundToNearestGrid(mouseWorld);
+
+        var pointerHex = BallGrid.current.WorldPosToHex(pointerWorldPos);
+        var roundedGrid = BallGrid.current.RoundToNearestGrid(pointerWorldPos);
         var gridRectTransform = BallGrid.current.GetComponent<RectTransform>();
         GUI.Box(new Rect(5, 25, 400, 100), "");
         //The Labels show what the Sliders represent
-        GUI.Label(new Rect(10, 30, 400, 200), $@"Mouse(World) X: {mouseWorld.x}, Y: {mouseWorld.y}, Z: {mouseWorld.z}
-Mouse(Hex): Q: {mouseHex.q}, R: {mouseHex.r}
-Mouse(Rounded) X: {roundedGrid.x}, Col: {roundedGrid.y}
-This X: {position.x}, Y : {position.y}, Z: {position.z}
-ballGrid X: {gridRectTransform.worldToLocalMatrix * mouseWorld}
-Pivot X: {pivotPosition.x}, Y : {pivotPosition.y}, Z: {pivotPosition.z}
-Distance: {Vector2.Distance(position, mouseWorld)}
+        GUI.Label(new Rect(10, 30, 400, 200), $@"Pointer(World): {pointerWorldPos}
+Pointer(Hex): {pointerHex}
+Pointer(Rounded): {roundedGrid}
+ballGrid: {gridRectTransform.worldToLocalMatrix * pointerWorldPos}
+Ray: {_aimRay.origin}
 ");
     }
 
@@ -84,7 +70,18 @@ Distance: {Vector2.Distance(position, mouseWorld)}
     }
 #endif
 
+    private Vector2? PointerWorldPos() {
+        // TODO: Support touch
+        var inputPointer = Pointer.current;
+        if(inputPointer is null || !inputPointer.wasUpdatedThisFrame) return null;
+
+        Vector3 pointer3d = inputPointer.position.value;
+        pointer3d.z = _rectTransform.position.z;
+        return _mainCamera.ScreenToWorldPoint(pointer3d);
+    }
+
     private void OnFire(InputValue value) {
+        Debug.Log($"OnFire: {value}");
         var hit = Physics2D.Raycast(_aimRay.origin, _aimRay.direction);
         if(!hit) return;
         Debug.DrawLine(_aimRay.origin, hit.point, Color.red, 2);
