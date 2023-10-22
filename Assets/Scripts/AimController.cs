@@ -7,10 +7,10 @@ public class AimController : MonoBehaviour {
     [Tooltip("Aim pointer object")] public RectTransform pointer;
 
     public GameObject projectilePrefab;
-    public Transform projectileParent;
-
+    public float maxAngle = 90;
     public float shootThrust = 5000; // Should be positive
 
+    private float _aimAngle;
     private Ray2D _aimRay;
     private BallController _currProjectile;
     private Camera _mainCamera;
@@ -38,7 +38,7 @@ public class AimController : MonoBehaviour {
     private void FixedUpdate() {
         var pointerWorld = PointerWorldPos();
         if(pointerWorld is not null) {
-            _aimRay = PointAt(_rectTransform.position, (Vector2)pointerWorld);
+            (_aimRay, _aimAngle) = PointAt(_rectTransform.position, (Vector2)pointerWorld);
         }
     }
 
@@ -56,6 +56,7 @@ public class AimController : MonoBehaviour {
 Pointer(Hex): {pointerHex}
 Pointer(Rounded): {roundedGrid}
 ballGrid: {gridRectTransform.worldToLocalMatrix * pointerWorldPos}
+Angle: {_aimAngle}
 Ray: {_aimRay.origin}
 ");
     }
@@ -81,6 +82,11 @@ Ray: {_aimRay.origin}
     }
 
     private void OnFire(InputValue value) {
+        if(Mathf.Abs(_aimAngle) > maxAngle) {
+            Debug.Log($"OnFire: Over max angle: abs({_aimAngle}) > {maxAngle}");
+            return;
+        }
+
         Debug.Log($"OnFire: {value}");
         var hit = Physics2D.Raycast(_aimRay.origin, _aimRay.direction);
         if(!hit) return;
@@ -98,7 +104,7 @@ Ray: {_aimRay.origin}
     /// <param name="myWorldPos">Pivot to point at (world coordinates)</param>
     /// <param name="targetWorldPos">Target to point at (world coordinates)</param>
     /// <returns>A ray from <paramref name="myWorldPos" /> to <paramref name="targetWorldPos" /></returns>
-    private Ray2D PointAt(Vector2 myWorldPos, Vector2 targetWorldPos) {
+    private (Ray2D, float) PointAt(Vector2 myWorldPos, Vector2 targetWorldPos) {
         var moveDirection = targetWorldPos - myWorldPos;
         var angle = Vector2.SignedAngle(Vector2.up, moveDirection);
         var angleAxis = Quaternion.AngleAxis(angle, Vector3.forward);
@@ -111,7 +117,7 @@ Ray: {_aimRay.origin}
                 angleAxis);
         }
 
-        return lookingRay;
+        return (lookingRay, angle);
     }
 
     private BallController NewProjectile() {
