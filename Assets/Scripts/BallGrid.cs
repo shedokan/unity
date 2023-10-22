@@ -12,11 +12,10 @@ public class BallGrid : MonoBehaviour {
     /*
      * Config
      */
-    public RectTransform gridOrigin;
     public GameObject ballObject;
+    public Vector2Int gridSize;
     public byte ballsPerRow = 10;
     public byte rowCount = 5;
-    public bool hexagonalPacking = true;
     public int groupHitThreshold = 3;
 
     private readonly HexMap<BallController> _grid = new();
@@ -37,7 +36,7 @@ public class BallGrid : MonoBehaviour {
 
     // Start is called before the first frame update
     private void Start() {
-        Assert.IsNull(current);
+        Assert.IsNull(current, "BallGrid already intantiated");
         current = this;
 
         // Validate parameters
@@ -47,6 +46,10 @@ public class BallGrid : MonoBehaviour {
 
         CalculateScreen();
         BallsCreate();
+    }
+
+    private void OnDestroy() {
+        current = null;
     }
 
 #if UNITY_EDITOR
@@ -90,8 +93,6 @@ public class BallGrid : MonoBehaviour {
 
             return ball;
         });
-
-        Debug.Log("CreateBalls: Done");
     }
 
     private void BallReposition() {
@@ -107,14 +108,6 @@ public class BallGrid : MonoBehaviour {
         ballController.color = BallController.RandomColor();
 
         return ballController;
-    }
-
-    private void ClearGrid() {
-        if(_grid.hexes.Count == 0) return;
-
-        foreach(var (_, ball) in _grid.hexes) Destroy(ball.gameObject);
-
-        _grid.hexes.Clear();
     }
 
     public Vector2 RoundToNearestGrid(Vector2 point) {

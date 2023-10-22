@@ -4,14 +4,10 @@ using UnityEngine.InputSystem;
 
 /// <summary>Add to aim center</summary>
 public class AimController : MonoBehaviour {
-    /// <summary>Object used to show direction</summary>
-    public GameObject pointer;
+    [Tooltip("Aim pointer object")] public RectTransform pointer;
 
-    /// <summary>Prefab used to shoot</summary>
     public GameObject projectilePrefab;
-
-    /// <summary>Where to add the projectile upon shooting</summary>
-    public GameObject projectileParent;
+    public Transform projectileParent;
 
     public float shootThrust = 5000; // Should be positive
 
@@ -19,7 +15,6 @@ public class AimController : MonoBehaviour {
     private BallController _currProjectile;
     private Camera _mainCamera;
     private Vector2 _pointerOffset;
-    private RectTransform _pointerRectTransform;
     private RectTransform _rectTransform;
 
     // Start is called before the first frame update
@@ -28,8 +23,7 @@ public class AimController : MonoBehaviour {
         _rectTransform = GetComponent<RectTransform>();
 
         if(pointer) {
-            _pointerRectTransform = pointer.GetComponent<RectTransform>();
-            _pointerOffset = _pointerRectTransform.position - _rectTransform.position;
+            _pointerOffset = pointer.position - _rectTransform.position;
         }
 
         var ballController = projectilePrefab.GetComponent<BallController>();
@@ -59,7 +53,7 @@ public class AimController : MonoBehaviour {
 
         var mouseWorld = _mainCamera.ScreenToWorldPoint(mouse3d);
 
-        var position = _pointerRectTransform.position;
+        var position = pointer.position;
         var pivotPosition = _rectTransform.position;
 
         if(!BallGrid.current) return;
@@ -113,8 +107,8 @@ Distance: {Vector2.Distance(position, mouseWorld)}
 
         if(pointer) {
             var point = lookingRay.GetPoint(_pointerOffset.magnitude);
-            _pointerRectTransform.SetPositionAndRotation(
-                new Vector3(point.x, point.y, _pointerRectTransform.position.z),
+            pointer.SetPositionAndRotation(
+                new Vector3(point.x, point.y, pointer.position.z),
                 angleAxis);
         }
 
@@ -123,7 +117,7 @@ Distance: {Vector2.Distance(position, mouseWorld)}
 
     private BallController NewProjectile() {
         var projectile = Instantiate(projectilePrefab, _rectTransform.position, _rectTransform.rotation,
-            projectileParent.transform);
+            projectileParent);
         projectile.layer = Layers.Aimer;
 
         var ballController = projectile.GetComponent<BallController>();

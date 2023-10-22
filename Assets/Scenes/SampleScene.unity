@@ -173,9 +173,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bcf5523734f14065a2bec35684d4ad6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointer: {fileID: 546138420}
+  pointer: {fileID: 546138421}
   projectilePrefab: {fileID: 3090069234960831311, guid: 347faa6f3a1954a10b8ed235ec2ac9e9, type: 3}
-  projectileParent: {fileID: 582303385}
+  projectileParent: {fileID: 582303387}
   shootThrust: 5000
 --- !u!114 &93546386
 MonoBehaviour:
@@ -531,11 +531,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d17961477eca741a1be322e389ae885d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridOrigin: {fileID: 0}
   ballObject: {fileID: 3090069234960831311, guid: 347faa6f3a1954a10b8ed235ec2ac9e9, type: 3}
+  gridSize: {x: 0, y: 0}
   ballsPerRow: 10
   rowCount: 5
-  hexagonalPacking: 1
   groupHitThreshold: 3
 --- !u!1 &1073257586
 GameObject:
