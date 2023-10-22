@@ -12,11 +12,12 @@ public class BallGrid : MonoBehaviour {
     /*
      * Config
      */
-    public GameObject ballObject;
-    public Vector2Int gridSize;
+    [Header("Grid Setup")] public GameObject ballObject;
+
     public byte ballsPerRow = 10;
     public byte rowCount = 5;
-    public int groupHitThreshold = 3;
+
+    [Header("Hit")] [Min(1)] public int groupHitThreshold = 3;
 
     private readonly HexMap<BallController> _grid = new();
 

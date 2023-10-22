@@ -4,11 +4,14 @@ using UnityEngine.InputSystem;
 
 /// <summary>Add to aim center</summary>
 public class AimController : MonoBehaviour {
-    [Tooltip("Aim pointer object")] public RectTransform pointer;
+    [Header("Aim")] [Tooltip("Aim pointer object")]
+    public RectTransform pointer;
 
-    public GameObject projectilePrefab;
-    public float maxAngle = 90;
-    public float shootThrust = 5000; // Should be positive
+    [Range(0, 180)] public float maxAngle = 90;
+
+    [Header("Shooting")] public GameObject projectilePrefab;
+
+    [Min(0)] public float shootThrust = 5000; // Should be positive
 
     private float _aimAngle;
     private Ray2D _aimRay;
