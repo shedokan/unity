@@ -32,6 +32,7 @@ public class BallGrid : MonoBehaviour {
      * Private
      */
     private RectTransform _rectTransform;
+    public BallPool pool { get; private set; }
     public static BallGrid current { get; private set; }
 
     // Start is called before the first frame update
@@ -44,12 +45,15 @@ public class BallGrid : MonoBehaviour {
         _rectTransform = GetComponent<RectTransform>();
         Assert.IsNotNull(_rectTransform);
 
+        pool = new BallPool(ballObject, gameObject);
+
         CalculateScreen();
         BallsCreate();
     }
 
     private void OnDestroy() {
         current = null;
+        pool.Dispose();
     }
 
 #if UNITY_EDITOR
@@ -88,7 +92,8 @@ public class BallGrid : MonoBehaviour {
     private void BallsCreate() {
         // TODO: Consider replacing with iterator
         _grid.FillRectangle(Vector2Int.zero, new Vector2Int(ballsPerRow - 1, rowCount - 1), hex => {
-            var ball = CreateBall();
+            var ball = pool.Get();
+            ball.color = BallController.RandomColor();
             ball.LockPosition(hex);
 
             return ball;
@@ -97,17 +102,6 @@ public class BallGrid : MonoBehaviour {
 
     private void BallReposition() {
         foreach(var (hex, value) in _grid.hexes) value.LockPosition(hex);
-    }
-
-
-    private BallController CreateBall() {
-        // TODO: Use object pooling
-        var newObject = Instantiate(ballObject, transform);
-
-        var ballController = newObject.GetComponent<BallController>();
-        ballController.color = BallController.RandomColor();
-
-        return ballController;
     }
 
     public Vector2 RoundToNearestGrid(Vector2 point) {

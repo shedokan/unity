@@ -25,23 +25,12 @@ public class BallController : MonoBehaviour {
         }
     }
 
-    // Can't initialize on Start() due to usage before Start()
-    private TargetJoint2D targetJoint2D {
-        get {
-            if(!_targetJoint2D) {
-                _targetJoint2D = GetComponent<TargetJoint2D>();
-                Assert.IsNotNull(_targetJoint2D);
-            }
-
-            return _targetJoint2D;
-        }
-    }
-
     private bool moving => hexCoords is null;
 
-    private void Start() {
+    private void Awake() {
+        _targetJoint2D = GetComponent<TargetJoint2D>();
+        Assert.IsNotNull(_targetJoint2D);
         _rigidBody2d = GetComponent<Rigidbody2D>();
-        Assert.IsNotNull(_rigidBody2d);
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
@@ -52,6 +41,27 @@ public class BallController : MonoBehaviour {
         HitBall();
     }
 
+#if UNITY_EDITOR
+    private void OnValidate() {
+        Assert.IsNotNull(GetComponent<Rigidbody2D>(), "Must have Rigidbody2D");
+        Assert.IsNotNull(GetComponent<TargetJoint2D>(), "Must have TargetJoint2D");
+    }
+#endif
+
+    /// <summary>Recycle the pool object for another use</summary>
+    public void Recycle() {
+        _dropped = false;
+        hexCoords = null;
+        ResetMovement();
+    }
+
+    private void ResetMovement() {
+        _rigidBody2d.velocity = Vector2.zero;
+        _rigidBody2d.gravityScale = 0;
+
+        _targetJoint2D.enabled = true;
+    }
+
     public static Color RandomColor() {
         var randIndex = Random.Range(0, Colors.Length);
         return Colors[randIndex];
@@ -59,12 +69,9 @@ public class BallController : MonoBehaviour {
 
     public Vector2 LockPosition(Hex newHex, bool skipReposition = false) {
         hexCoords = newHex;
-        targetJoint2D.enabled = true;
 
         var pos = BallGrid.current.PosInGrid(newHex);
         if(!skipReposition) transform.SetLocalPositionAndRotation(pos, Quaternion.identity);
-        // Debug.Log($"LockPosition({newHex}: {pos}");
-
 
         return pos;
     }
@@ -73,7 +80,7 @@ public class BallController : MonoBehaviour {
         gameObject.layer = Layers.MovingBalls;
         hexCoords = null;
 
-        targetJoint2D.enabled = false;
+        _targetJoint2D.enabled = false;
 
         _rigidBody2d.AddForce(force);
     }
@@ -89,17 +96,17 @@ public class BallController : MonoBehaviour {
             return;
         }
 
+        ResetMovement();
+
         var pos = LockPosition(newHex);
         var worldPos = ballGrid.transform.TransformPoint(pos);
-        targetJoint2D.target = worldPos;
-
-        _rigidBody2d.velocity = Vector2.zero;
+        _targetJoint2D.target = worldPos;
 
         ballGrid.CheckHit(newHex, color);
     }
 
     public void Drop() {
-        targetJoint2D.enabled = false;
+        _targetJoint2D.enabled = false;
         _rigidBody2d.gravityScale = 5;
 
         if(hexCoords is { } hex) {

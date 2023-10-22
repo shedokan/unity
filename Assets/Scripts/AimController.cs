@@ -18,7 +18,7 @@ public class AimController : MonoBehaviour {
     private RectTransform _rectTransform;
 
     // Start is called before the first frame update
-    private void Start() {
+    private void Awake() {
         _mainCamera = Camera.main;
         _rectTransform = GetComponent<RectTransform>();
 
@@ -28,7 +28,9 @@ public class AimController : MonoBehaviour {
 
         var ballController = projectilePrefab.GetComponent<BallController>();
         Assert.IsNotNull(ballController);
+    }
 
+    private void Start() {
         _currProjectile = NewProjectile();
     }
 
@@ -116,14 +118,12 @@ Distance: {Vector2.Distance(position, mouseWorld)}
     }
 
     private BallController NewProjectile() {
-        var projectile = Instantiate(projectilePrefab, _rectTransform.position, _rectTransform.rotation,
-            projectileParent);
-        projectile.layer = Layers.Aimer;
+        var projectile = BallGrid.current.pool.Get();
+        projectile.transform.SetPositionAndRotation(_rectTransform.position, _rectTransform.rotation);
+        projectile.gameObject.layer = Layers.Aimer;
+        projectile.color = BallController.RandomColor();
 
-        var ballController = projectile.GetComponent<BallController>();
-        ballController.color = BallController.RandomColor();
-
-        return ballController;
+        return projectile;
     }
 
     /// <summary>
