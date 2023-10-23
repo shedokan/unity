@@ -137,8 +137,7 @@ Ray: {_aimRay.origin}
 
     private BallController NewProjectile() {
         var projectile = BallGrid.current.pool.Get();
-        projectile.transform.SetPositionAndRotation(_rectTransform.position, _rectTransform.rotation);
-        projectile.gameObject.layer = Layers.Aimer;
+        projectile.PrepToShoot(_rectTransform);
         projectile.color = BallController.RandomColor();
 
         return projectile;

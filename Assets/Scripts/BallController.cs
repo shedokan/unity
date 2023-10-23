@@ -117,4 +117,9 @@ public class BallController : MonoBehaviour {
         _dropped = true;
         gameObject.layer = Layers.Falling;
     }
+
+    public void PrepToShoot(RectTransform rectTransform) {
+        transform.SetPositionAndRotation(rectTransform.position, rectTransform.rotation);
+        gameObject.layer = Layers.Aimer;
+    }
 }
