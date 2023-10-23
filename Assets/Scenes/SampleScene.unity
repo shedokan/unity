@@ -176,7 +176,6 @@ MonoBehaviour:
   pointer: {fileID: 546138421}
   maxAngle: 90
   projectilePrefab: {fileID: 3090069234960831311, guid: 347faa6f3a1954a10b8ed235ec2ac9e9, type: 3}
-  projectileParent: {fileID: 582303387}
   shootThrust: 5000
 --- !u!114 &93546386
 MonoBehaviour:
@@ -642,6 +641,54 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1415084812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1415084814}
+  - component: {fileID: 1415084813}
+  m_Layer: 5
+  m_Name: DottedLine
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1415084813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415084812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0e40b5d054b0674a844bd74524096ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dotPrefab: {fileID: 7048630347244437945, guid: a4f10d13e85bd48c0922e3aa563b363c, type: 3}
+  Size: 1
+  Offset: 2
+  MaxPoints: 1000
+--- !u!4 &1415084814
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1415084812}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 99}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1635192838
 GameObject:
   m_ObjectHideFlags: 0
@@ -993,3 +1040,4 @@ SceneRoots:
   - {fileID: 1817692208}
   - {fileID: 1073257590}
   - {fileID: 1997958583}
+  - {fileID: 1415084814}

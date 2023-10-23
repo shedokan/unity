@@ -13,6 +13,7 @@ public class AimController : MonoBehaviour {
 
     [Min(0)] public float shootThrust = 5000; // Should be positive
 
+    private Vector2? _activeTarget;
     private float _aimAngle;
     private Ray2D _aimRay;
     private BallController _currProjectile;
@@ -39,10 +40,27 @@ public class AimController : MonoBehaviour {
 
     // Update is called once per frame
     private void FixedUpdate() {
+        _activeTarget = null;
         var pointerWorld = PointerWorldPos();
-        if(pointerWorld is not null) {
-            (_aimRay, _aimAngle) = PointAt(_rectTransform.position, (Vector2)pointerWorld);
+        if(pointerWorld is null) {
+            return;
         }
+
+        (_aimRay, _aimAngle) = PointAt(_rectTransform.position, (Vector2)pointerWorld);
+
+        if(Mathf.Abs(_aimAngle) > maxAngle) {
+            Debug.Log($"OnFire: Over max angle: abs({_aimAngle}) > {maxAngle}");
+            return;
+        }
+
+        var hit = Physics2D.Raycast(_aimRay.origin, _aimRay.direction, float.PositiveInfinity,
+            Layers.RaycastLayers);
+        if(!hit) return;
+
+        DottedLine.DottedLine.Instance.DrawDottedLine(_aimRay.origin, hit.point);
+
+        Debug.DrawLine(_aimRay.origin, hit.point, Color.white);
+        _activeTarget = hit.point;
     }
 
     private void OnGUI() {
@@ -85,15 +103,9 @@ Ray: {_aimRay.origin}
     }
 
     private void OnFire(InputValue value) {
-        if(Mathf.Abs(_aimAngle) > maxAngle) {
-            Debug.Log($"OnFire: Over max angle: abs({_aimAngle}) > {maxAngle}");
-            return;
-        }
+        if(_activeTarget is null) return;
 
-        Debug.Log($"OnFire: {value}");
-        var hit = Physics2D.Raycast(_aimRay.origin, _aimRay.direction);
-        if(!hit) return;
-        Debug.DrawLine(_aimRay.origin, hit.point, Color.red, 2);
+        Debug.DrawLine(_aimRay.origin, (Vector2)_activeTarget, Color.red, 2);
 
         ShootProjectile(_aimRay);
 
