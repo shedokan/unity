@@ -265,10 +265,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2649116462794519056, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_CastShadows
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
       propertyPath: m_Name
       value: Egg Pin (3)
@@ -277,17 +273,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7138951613810356420, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 767125952}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
 --- !u!1001 &241445785
 PrefabInstance:
@@ -337,10 +326,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2649116462794519056, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_CastShadows
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
       propertyPath: m_Name
       value: Egg Pin (5)
@@ -349,69 +334,11 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7138951613810356420, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 445885426}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
---- !u!1 &348093225 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-  m_PrefabInstance: {fileID: 1009021121}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &348093226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 348093225}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d73db8f3ba6d743649db197c7c6d4961, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &399472895 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-  m_PrefabInstance: {fileID: 1040391055}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &399472896
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 399472895}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d73db8f3ba6d743649db197c7c6d4961, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &445885425 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-  m_PrefabInstance: {fileID: 241445785}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &445885426
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 445885425}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d73db8f3ba6d743649db197c7c6d4961, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &557019110
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -460,10 +387,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2649116462794519056, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_CastShadows
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
       propertyPath: m_Name
       value: Egg Pin (1)
@@ -472,52 +395,11 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7138951613810356420, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 712147931}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
---- !u!1 &712147930 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-  m_PrefabInstance: {fileID: 557019110}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &712147931
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 712147930}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d73db8f3ba6d743649db197c7c6d4961, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &767125951 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-  m_PrefabInstance: {fileID: 237282648}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &767125952
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 767125951}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d73db8f3ba6d743649db197c7c6d4961, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1009021121
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -566,10 +448,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2649116462794519056, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_CastShadows
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
       propertyPath: m_Name
       value: Egg Pin (2)
@@ -578,17 +456,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7138951613810356420, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 348093226}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
 --- !u!1001 &1040391055
 PrefabInstance:
@@ -638,10 +509,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2649116462794519056, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_CastShadows
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
       propertyPath: m_Name
       value: Egg Pin (4)
@@ -650,17 +517,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7138951613810356420, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 399472896}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
 --- !u!1 &1420733086
 GameObject:
@@ -768,23 +628,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1553220903 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-  m_PrefabInstance: {fileID: 1730764574}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1553220904
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1553220903}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d73db8f3ba6d743649db197c7c6d4961, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1644187245
 GameObject:
   m_ObjectHideFlags: 0
@@ -925,10 +768,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2649116462794519056, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_CastShadows
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
       propertyPath: m_Name
       value: Egg Pin
@@ -937,23 +776,11 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7138951613810356420, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3848374404417645707, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1553220904}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e332269ab3d142c699b85a327c6e881, type: 3}
---- !u!1 &6050638527682901717 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1018005750412398041, guid: c6aa9f3f6fc61422b994207008e6ecb5, type: 3}
-  m_PrefabInstance: {fileID: 7231785897589774686}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7231785897589774686
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1010,38 +837,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
-    - target: {fileID: 2272927568005403458, guid: c6aa9f3f6fc61422b994207008e6ecb5, type: 3}
-      propertyPath: m_CastShadows
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6366441004143743382, guid: c6aa9f3f6fc61422b994207008e6ecb5, type: 3}
-      propertyPath: m_Mass
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6366441004143743382, guid: c6aa9f3f6fc61422b994207008e6ecb5, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1018005750412398041, guid: c6aa9f3f6fc61422b994207008e6ecb5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7403639930377328561}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c6aa9f3f6fc61422b994207008e6ecb5, type: 3}
---- !u!114 &7403639930377328561
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6050638527682901717}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d73db8f3ba6d743649db197c7c6d4961, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
