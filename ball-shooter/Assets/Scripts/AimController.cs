@@ -43,6 +43,8 @@ public class AimController : MonoBehaviour {
         _activeTarget = null;
         var pointerWorld = PointerWorldPos();
         if(pointerWorld is null) {
+            Debug.Log("No pointerWorld");
+            DottedLine.DottedLine.Instance.Clear();
             return;
         }
 
@@ -55,9 +57,12 @@ public class AimController : MonoBehaviour {
 
         var hit = Physics2D.Raycast(_aimRay.origin, _aimRay.direction, float.PositiveInfinity,
             Layers.RaycastLayers);
-        if(!hit) return;
+        if(!hit) {
+            Debug.Log("No hit");
+            return;
+        }
 
-        DottedLine.DottedLine.Instance.DrawDottedLine(_aimRay.origin, hit.point);
+        // DottedLine.DottedLine.Instance.Draw(_aimRay.origin, hit.point);
 
         Debug.DrawLine(_aimRay.origin, hit.point, Color.white);
         _activeTarget = hit.point;
