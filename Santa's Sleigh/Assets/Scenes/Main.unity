@@ -1074,7 +1074,7 @@ MonoBehaviour:
   physicsMode: 1
   _motion:
     enabled: 1
-    offset: {x: 0, y: 3}
+    offset: {x: 0, y: 3.7}
     useSplineSizes: 1
     rotationOffset: {x: 0, y: 0, z: 0}
     baseScale: {x: 1, y: 1, z: 1}
